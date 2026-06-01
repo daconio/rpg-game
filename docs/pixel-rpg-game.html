@@ -1,0 +1,1239 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>해커톤 대모험: 플레이어블 픽셀 RPG</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1014;
+      --panel: #151a1f;
+      --ink: #f8e6bb;
+      --muted: #c9ad75;
+      --gold: #e8ae4a;
+      --line: #9f7135;
+      --green: #7bd949;
+      --red: #d84b3f;
+      --blue: #4ca6d8;
+      font-family: "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(57, 121, 92, 0.16), transparent 24rem),
+        radial-gradient(circle at 82% 28%, rgba(180, 68, 42, 0.14), transparent 26rem),
+        linear-gradient(180deg, #070a0d, var(--bg));
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    .shell {
+      width: min(1280px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 18px 0 28px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 3vw, 2.2rem);
+      line-height: 1.1;
+      text-shadow: 0 4px 0 rgba(0, 0, 0, 0.42);
+    }
+
+    .links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .file-button input {
+      display: none;
+    }
+
+    a,
+    button,
+    .file-button span {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: linear-gradient(180deg, #2c2117, #15100b);
+      color: var(--ink);
+      padding: 8px 10px;
+      text-decoration: none;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    button:hover,
+    a:hover,
+    .file-button:hover span {
+      border-color: var(--gold);
+    }
+
+    .game-wrap {
+      border: 4px solid #2b1b0d;
+      border-radius: 8px;
+      background: #070a0d;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.45), inset 0 0 0 3px rgba(255, 219, 123, 0.12);
+      overflow: hidden;
+      position: relative;
+    }
+
+    canvas {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: calc(100vh - 170px);
+      min-height: 420px;
+      display: block;
+      background: #111;
+      image-rendering: pixelated;
+    }
+
+    .hud {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px;
+      background: linear-gradient(180deg, #21170e, #0d0a07);
+      border-top: 3px solid var(--line);
+    }
+
+    .help {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .help b {
+      color: var(--ink);
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold);
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .mobile-pad {
+      display: none;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .mobile-pad button {
+      min-height: 48px;
+      padding: 0;
+    }
+
+    @media (max-width: 760px) {
+      .top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      canvas {
+        min-height: 340px;
+      }
+
+      .hud {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        white-space: normal;
+      }
+
+      .mobile-pad {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top">
+      <div>
+        <h1>해커톤 대모험: 플레이어블 픽셀 RPG</h1>
+        <div class="help">전사, 기사, 궁수, 마법사, 성직자를 교체하며 숲길을 돌파하고 보스를 쓰러뜨리세요.</div>
+      </div>
+      <div class="links">
+        <a href="./game-design.html">기획서</a>
+        <label class="file-button">
+          <input id="characterImport" type="file" accept="image/*">
+          <span>캐릭터 이미지 적용</span>
+        </label>
+        <button id="restartTop" type="button">처음부터</button>
+      </div>
+    </div>
+
+    <section class="game-wrap" aria-label="플레이 가능한 픽셀 RPG 게임">
+      <canvas id="game" width="1280" height="720"></canvas>
+      <div class="hud">
+        <div class="help">
+          <b>A/D 또는 ←/→</b> 이동 · <b>W/Space/↑</b> 점프 · <b>J</b> 공격 · <b>K</b> 스킬 · <b>1~5</b> 전사/기사/궁수/마법사/성직자 교체 · <b>R</b> 재시작
+        </div>
+        <div class="status" id="status">로딩 중...</div>
+      </div>
+    </section>
+
+    <div class="mobile-pad" aria-label="모바일 조작">
+      <button data-hold="left" type="button">←</button>
+      <button data-hold="right" type="button">→</button>
+      <button data-tap="jump" type="button">점프</button>
+      <button data-tap="attack" type="button">공격</button>
+      <button data-tap="skill" type="button">스킬</button>
+      <button data-tap="switch" type="button">교체</button>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+      const statusEl = document.getElementById("status");
+      const W = canvas.width;
+      const H = canvas.height;
+      const worldW = 4300;
+      const HERO_FRAME_W = 480;
+      const HERO_FRAME_H = 400;
+      const ACTION_FRAME_W = 240;
+      const ACTION_FRAME_H = 180;
+      const gravity = 0.72;
+      const keys = new Set();
+      const pressed = new Set();
+      const assets = {};
+      const imageSources = {
+        worldBg: "assets/pixel-rpg/world-bg-triano-raster.png",
+        heroes: "assets/pixel-rpg/heroes-hd.png",
+        warriorActions: "assets/pixel-rpg/warrior-actions-hd.png",
+        knightActions: "assets/pixel-rpg/knight-actions-hd.png",
+        rangerActions: "assets/pixel-rpg/ranger-actions-hd.png",
+        mageActions: "assets/pixel-rpg/mage-actions-hd.png",
+        clericActions: "assets/pixel-rpg/cleric-actions-hd.png",
+        enemies: "assets/pixel-rpg/enemies.png",
+        boss: "assets/pixel-rpg/boss.png"
+      };
+
+      const actionAnimations = {
+        idle: { row: 0, frames: 4, speed: 18 },
+        walk: { row: 1, frames: 4, speed: 9 },
+        run: { row: 2, frames: 4, speed: 6 },
+        jump: { row: 3, frames: 4, speed: 9 },
+        attack: { row: 4, frames: 4, speed: 5 },
+        skill: { row: 5, frames: 4, speed: 8 },
+        guard: { row: 6, frames: 4, speed: 12 },
+        hit: { row: 7, frames: 4, speed: 7 }
+      };
+
+      const roleActionAssetKeys = {
+        warrior: "warriorActions",
+        knight: "knightActions",
+        ranger: "rangerActions",
+        mage: "mageActions",
+        cleric: "clericActions"
+      };
+
+      const roles = [
+        {
+          id: "warrior",
+          name: "전사",
+          color: "#74432a",
+          accent: "#d5b061",
+          hair: "#5b311b",
+          maxHp: 130,
+          attack: 24,
+          range: 70,
+          speed: 3.7,
+          skill: "방패 돌진",
+          skillCost: 28
+        },
+        {
+          id: "knight",
+          name: "기사",
+          color: "#2d548c",
+          accent: "#d8e8ff",
+          hair: "#e3c776",
+          maxHp: 148,
+          attack: 20,
+          range: 76,
+          speed: 3.45,
+          skill: "수호 방벽",
+          skillCost: 26
+        },
+        {
+          id: "ranger",
+          name: "궁수",
+          color: "#2f7d3e",
+          accent: "#d09a48",
+          hair: "#d9be76",
+          maxHp: 92,
+          attack: 17,
+          range: 270,
+          speed: 4.35,
+          skill: "관통 화살",
+          skillCost: 24
+        },
+        {
+          id: "mage",
+          name: "마법사",
+          color: "#5b3a8d",
+          accent: "#69c9ff",
+          hair: "#241a38",
+          maxHp: 84,
+          attack: 15,
+          range: 210,
+          speed: 3.75,
+          skill: "비전 폭발",
+          skillCost: 34
+        },
+        {
+          id: "cleric",
+          name: "성직자",
+          color: "#f1e6c7",
+          accent: "#d7aa43",
+          hair: "#ead9ad",
+          maxHp: 104,
+          attack: 12,
+          range: 120,
+          speed: 3.55,
+          skill: "치유 빔",
+          skillCost: 30
+        }
+      ];
+
+      let state;
+
+      function reset() {
+        state = {
+          time: 0,
+          camera: 0,
+          gold: 0,
+          teamLevel: 1,
+          exp: 0,
+          selected: 0,
+          message: "마을 밖 숲길을 돌파하세요. 1~5로 다섯 직업을 교체할 수 있습니다.",
+          messageTime: 240,
+          shake: 0,
+          won: false,
+          gameOver: false,
+          levelToast: null,
+          stageStars: 0,
+          rewardItems: [
+            { name: "골드", qty: 659, color: "#f0c34a" },
+            { name: "강화 부품", qty: 2, color: "#aeb7c2" },
+            { name: "치유 물약", qty: 1, color: "#f08a3e" },
+            { name: "영웅 조각", qty: 3, color: "#58c6e8" }
+          ],
+          quests: [
+            { text: "슬라임 3마리 처치", done: 0, need: 3, reward: 80, paid: false },
+            { text: "스킬 2회 사용", done: 0, need: 2, reward: 60, paid: false },
+            { text: "화염 파수꾼 처치", done: 0, need: 1, reward: 200, paid: false }
+          ],
+          player: {
+            x: 90,
+            y: 446,
+            w: 46,
+            h: 68,
+            vx: 0,
+            vy: 0,
+            facing: 1,
+            onGround: false,
+            hp: 130,
+            mp: 78,
+            maxMp: 100,
+            invuln: 0,
+            attackCd: 0,
+            skillCd: 0,
+            action: "idle",
+            actionTime: 0
+          },
+          enemies: [
+            makeEnemy("slime", 560, 500),
+            makeEnemy("slime", 980, 420),
+            makeEnemy("bat", 1320, 345),
+            makeEnemy("slime", 1760, 500),
+            makeEnemy("golem", 2250, 480),
+            makeEnemy("bat", 2660, 310),
+            makeEnemy("slime", 3020, 500)
+          ],
+          boss: {
+            type: "boss",
+            x: 3740,
+            y: 438,
+            w: 92,
+            h: 116,
+            vx: 0,
+            hp: 260,
+            maxHp: 260,
+            alive: true,
+            hit: 0,
+            cd: 0,
+            phase: 1
+          },
+          attacks: [],
+          particles: [],
+          pickups: []
+        };
+        applyRoleStats(true);
+        updateStatus();
+      }
+
+      function makeEnemy(type, x, y) {
+        const specs = {
+          slime: { w: 38, h: 30, hp: 42, speed: 0.75, dmg: 9, color: "#72b84a" },
+          bat: { w: 36, h: 26, hp: 30, speed: 1.15, dmg: 8, color: "#7652a8" },
+          golem: { w: 52, h: 66, hp: 86, speed: 0.55, dmg: 15, color: "#9a6d42" }
+        };
+        return { type, x, y, baseY: y, vx: -specs[type].speed, dir: -1, alive: true, hit: 0, ...specs[type], maxHp: specs[type].hp };
+      }
+
+      const platforms = [
+        { x: 0, y: 560, w: 900, h: 80 },
+        { x: 980, y: 500, w: 300, h: 34 },
+        { x: 1380, y: 560, w: 760, h: 80 },
+        { x: 2220, y: 525, w: 300, h: 34 },
+        { x: 2620, y: 470, w: 320, h: 34 },
+        { x: 3040, y: 560, w: 1260, h: 80 }
+      ];
+
+      const hazards = [
+        { x: 890, y: 594, w: 90, h: 44 },
+        { x: 2140, y: 594, w: 80, h: 44 },
+        { x: 3360, y: 594, w: 120, h: 44 }
+      ];
+
+      function loadAssets() {
+        return Promise.all(Object.entries(imageSources).map(([key, src]) => new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            assets[key] = img;
+            resolve();
+          };
+          img.onerror = () => reject(new Error(`이미지를 불러오지 못했습니다: ${src}`));
+          img.src = src;
+        })));
+      }
+
+      function buildRoster() {
+        assets.roster = document.createElement("canvas");
+        assets.roster.width = 520;
+        assets.roster.height = 108;
+        const r = assets.roster.getContext("2d");
+        r.imageSmoothingEnabled = false;
+        roles.forEach((hero, i) => {
+          r.drawImage(assets.heroes, i * HERO_FRAME_W, 0, HERO_FRAME_W, HERO_FRAME_H, 8 + i * 100, -4, 90, 90);
+          px(r, 10 + i * 100, 86, 82, 16, "rgba(10,14,18,.72)");
+          label(r, hero.name, 24 + i * 100, 99, "#f8e6bb", 13);
+        });
+      }
+
+      function sliceCharacterSheet(source) {
+        const sheet = document.createElement("canvas");
+        sheet.width = HERO_FRAME_W * roles.length;
+        sheet.height = HERO_FRAME_H;
+        const g = sheet.getContext("2d");
+        g.imageSmoothingEnabled = false;
+        const colW = source.width / roles.length;
+        const cropY = source.height * 0.08;
+        const cropH = source.height * 0.37;
+        for (let i = 0; i < roles.length; i++) {
+          const sx = i * colW;
+          const fit = Math.min((HERO_FRAME_W * 0.92) / colW, (HERO_FRAME_H * 0.92) / cropH);
+          const dw = colW * fit;
+          const dh = cropH * fit;
+          const dx = i * HERO_FRAME_W + (HERO_FRAME_W - dw) / 2;
+          const dy = HERO_FRAME_H - dh - 12;
+          g.drawImage(source, sx, cropY, colW, cropH, dx, dy, dw, dh);
+        }
+        return sheet;
+      }
+
+      function applyImportedCharacters(file) {
+        if (!file) return;
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          assets.heroes = sliceCharacterSheet(img);
+          buildRoster();
+          if (state) {
+            state.message = "선택한 캐릭터 이미지를 고해상도 픽셀 스프라이트로 적용했습니다.";
+            state.messageTime = 180;
+          }
+          URL.revokeObjectURL(url);
+        };
+        img.onerror = () => {
+          statusEl.textContent = "캐릭터 이미지를 불러오지 못했습니다.";
+          URL.revokeObjectURL(url);
+        };
+        img.src = url;
+      }
+
+      function px(g, x, y, w, h, color) {
+        g.fillStyle = color;
+        g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+      }
+
+      function role() {
+        return roles[state.selected];
+      }
+
+      function applyRoleStats(initial = false) {
+        const p = state.player;
+        const r = role();
+        const ratio = initial ? 1 : Math.max(0.15, p.hp / Math.max(1, roles.find(x => x.maxHp === p.maxHp)?.maxHp || r.maxHp));
+        p.maxHp = r.maxHp;
+        p.hp = Math.min(r.maxHp, Math.max(1, Math.round(r.maxHp * ratio)));
+        state.message = `${r.name} 선택: ${r.skill}`;
+        state.messageTime = 120;
+        updateStatus();
+      }
+
+      function updateStatus() {
+        statusEl.textContent = `팀 Lv.${state.teamLevel} · 골드 ${state.gold} · EXP ${state.exp}/100 · ${role().name}`;
+      }
+
+      function inputNames(e) {
+        const names = new Set();
+        const key = e.key ? e.key.toLowerCase() : "";
+        const codeMap = {
+          ArrowLeft: "arrowleft",
+          ArrowRight: "arrowright",
+          ArrowUp: "arrowup",
+          ArrowDown: "arrowdown",
+          Space: "space",
+          KeyA: "a",
+          KeyD: "d",
+          KeyW: "w",
+          KeyJ: "j",
+          KeyK: "k",
+          KeyR: "r",
+          Digit1: "1",
+          Digit2: "2",
+          Digit3: "3",
+          Digit4: "4",
+          Digit5: "5",
+          Numpad1: "1",
+          Numpad2: "2",
+          Numpad3: "3",
+          Numpad4: "4",
+          Numpad5: "5"
+        };
+        if (key) names.add(key === " " ? "space" : key);
+        if (codeMap[e.code]) names.add(codeMap[e.code]);
+        return [...names];
+      }
+
+      function keyDown(e) {
+        const names = inputNames(e);
+        if (names.some(k => ["space", "arrowup", "arrowdown", "arrowleft", "arrowright", "j", "k", "1", "2", "3", "4", "5"].includes(k))) {
+          e.preventDefault();
+        }
+        const alreadyDown = names.some(k => keys.has(k));
+        if (!alreadyDown) names.forEach(k => pressed.add(k));
+        names.forEach(k => keys.add(k));
+      }
+
+      function keyUp(e) {
+        inputNames(e).forEach(k => keys.delete(k));
+      }
+
+      window.addEventListener("keydown", keyDown);
+      window.addEventListener("keyup", keyUp);
+      document.getElementById("restartTop").addEventListener("click", reset);
+      document.getElementById("characterImport").addEventListener("change", event => {
+        applyImportedCharacters(event.target.files && event.target.files[0]);
+      });
+
+      document.querySelectorAll("[data-hold]").forEach(btn => {
+        const key = btn.dataset.hold;
+        const down = () => keys.add(key);
+        const up = () => keys.delete(key);
+        btn.addEventListener("pointerdown", down);
+        btn.addEventListener("pointerup", up);
+        btn.addEventListener("pointercancel", up);
+        btn.addEventListener("pointerleave", up);
+      });
+
+      document.querySelectorAll("[data-tap]").forEach(btn => {
+        btn.addEventListener("pointerdown", event => {
+          event.preventDefault();
+          const tap = btn.dataset.tap;
+          if (tap === "switch") {
+            state.selected = (state.selected + 1) % roles.length;
+            applyRoleStats();
+          } else {
+            pressed.add(tap);
+          }
+        });
+      });
+
+      function isDown(...names) {
+        return names.some(n => keys.has(n));
+      }
+
+      function wasPressed(...names) {
+        return names.some(n => pressed.has(n));
+      }
+
+      function rects(a, b) {
+        return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+      }
+
+      function damageTarget(target, amount, knock = 0) {
+        if (!target.alive) return;
+        target.hp -= amount;
+        target.hit = 10;
+        target.x += knock;
+        addParticles(target.x + target.w / 2, target.y + target.h / 2, "#ffe28a", 8);
+        if (target.hp <= 0) {
+          target.alive = false;
+          state.gold += target.type === "boss" ? 200 : 22;
+          state.exp += target.type === "boss" ? 65 : 18;
+          state.pickups.push({ x: target.x + target.w / 2, y: target.y, vy: -4, text: target.type === "boss" ? "+200G" : "+22G", life: 90 });
+          if (target.type === "boss") {
+            state.quests[2].done = 1;
+            state.stageStars = 3;
+            state.won = true;
+            state.message = "승리! 화염 파수꾼을 쓰러뜨리고 챕터 보상을 획득했습니다.";
+            state.messageTime = 999;
+          } else if (state.quests[0].done < state.quests[0].need) {
+            state.quests[0].done++;
+          }
+          payoutQuests();
+          levelUpCheck();
+        }
+      }
+
+      function payoutQuests() {
+        for (const q of state.quests) {
+          if (!q.paid && q.done >= q.need) {
+            q.paid = true;
+            state.gold += q.reward;
+            state.message = `퀘스트 완료: ${q.text} · 보상 ${q.reward}G`;
+            state.messageTime = 180;
+          }
+        }
+      }
+
+      function levelUpCheck() {
+        while (state.exp >= 100) {
+          state.exp -= 100;
+          state.teamLevel++;
+          state.player.maxMp += 8;
+          state.player.mp = state.player.maxMp;
+          state.levelToast = { level: state.teamLevel, life: 180 };
+          state.message = `새로운 팀 레벨! Lv.${state.teamLevel}`;
+          state.messageTime = 180;
+        }
+        updateStatus();
+      }
+
+      function addParticles(x, y, color, count) {
+        for (let i = 0; i < count; i++) {
+          state.particles.push({
+            x,
+            y,
+            vx: (Math.random() - 0.5) * 6,
+            vy: -Math.random() * 5,
+            color,
+            life: 22 + Math.random() * 18
+          });
+        }
+      }
+
+      function setPlayerAction(action, frames) {
+        const p = state.player;
+        p.action = action;
+        p.actionTime = Math.max(p.actionTime || 0, frames);
+      }
+
+      function playerActionForRole() {
+        const p = state.player;
+        if (state.won) return "skill";
+        if (p.actionTime > 0) return p.action;
+        if (p.invuln > 45 && p.hp > 0) return "guard";
+        if (!p.onGround) return "jump";
+        const speed = Math.abs(p.vx);
+        if (speed > 3.2) return "run";
+        if (speed > 0.35) return "walk";
+        return "idle";
+      }
+
+      function attack() {
+        const p = state.player;
+        if (p.attackCd > 0) return;
+        const r = role();
+        p.attackCd = r.id === "mage" ? 38 : r.id === "ranger" ? 30 : 24;
+        setPlayerAction("attack", r.id === "ranger" || r.id === "mage" ? 30 : 26);
+        const box = {
+          x: p.facing > 0 ? p.x + p.w : p.x - r.range,
+          y: p.y + 8,
+          w: r.range,
+          h: 34
+        };
+        state.attacks.push({ ...box, life: 8, color: r.accent, ranged: r.id === "ranger" || r.id === "mage" });
+        hitScan(box, r.attack, p.facing * 12);
+      }
+
+      function skill() {
+        const p = state.player;
+        const r = role();
+        if (p.skillCd > 0 || p.mp < r.skillCost) {
+          state.message = "마나 또는 스킬 쿨다운이 부족합니다.";
+          state.messageTime = 80;
+          return;
+        }
+        p.mp -= r.skillCost;
+        p.skillCd = 90;
+        state.quests[1].done = Math.min(state.quests[1].need, state.quests[1].done + 1);
+        payoutQuests();
+        if (r.id === "warrior") {
+          p.vx = p.facing * 11;
+          setPlayerAction("skill", 42);
+          const box = { x: p.facing > 0 ? p.x + p.w : p.x - 128, y: p.y, w: 128, h: 58 };
+          state.attacks.push({ ...box, life: 14, color: "#fff0a6" });
+          hitScan(box, 42, p.facing * 22);
+          state.message = "방패 돌진!";
+        } else if (r.id === "knight") {
+          p.hp = Math.min(p.maxHp, p.hp + 24);
+          p.invuln = Math.max(p.invuln, 90);
+          setPlayerAction("skill", 62);
+          const box = { x: p.x - 52, y: p.y - 10, w: 150, h: 82 };
+          state.attacks.push({ ...box, life: 24, color: "rgba(216,232,255,.82)" });
+          hitScan(box, 24, p.facing * 7);
+          state.message = "수호 방벽!";
+        } else if (r.id === "ranger") {
+          setPlayerAction("skill", 44);
+          for (let i = 0; i < 3; i++) {
+            const box = { x: p.facing > 0 ? p.x + p.w : p.x - 390, y: p.y + 8 + i * 14, w: 390, h: 8 };
+            state.attacks.push({ ...box, life: 16, color: "#76f4ff", ranged: true });
+            hitScan(box, 28, p.facing * 10);
+          }
+          state.message = "관통 화살!";
+        } else if (r.id === "mage") {
+          setPlayerAction("skill", 52);
+          const box = { x: p.x - 135, y: p.y - 78, w: 320, h: 190 };
+          state.attacks.push({ ...box, life: 24, color: "rgba(151,91,255,.72)", ranged: true });
+          hitScan(box, 44, p.facing * 5);
+          addParticles(p.x + p.w / 2, p.y + 8, "#b58cff", 24);
+          state.message = "비전 폭발!";
+        } else {
+          p.hp = Math.min(p.maxHp, p.hp + 46);
+          setPlayerAction("skill", 56);
+          addParticles(p.x + p.w / 2, p.y + p.h / 2, "#7cff72", 16);
+          const box = { x: p.x - 85, y: p.y - 30, w: 210, h: 110 };
+          state.attacks.push({ ...box, life: 18, color: "#8cff77" });
+          hitScan(box, 18, p.facing * 4);
+          state.message = "치유 빔!";
+        }
+        state.messageTime = 120;
+        updateStatus();
+      }
+
+      function hitScan(box, damage, knock) {
+        for (const e of state.enemies) {
+          if (e.alive && rects(box, e)) damageTarget(e, damage, knock);
+        }
+        if (state.boss.alive && rects(box, state.boss)) damageTarget(state.boss, damage, knock * 0.25);
+      }
+
+      function hurt(amount, fromX) {
+        const p = state.player;
+        if (p.invuln > 0 || state.gameOver || state.won) return;
+        p.hp -= amount;
+        p.invuln = 70;
+        p.vx = p.x < fromX ? -7 : 7;
+        p.vy = -5;
+        setPlayerAction("hit", 38);
+        state.shake = 10;
+        addParticles(p.x + p.w / 2, p.y + p.h / 2, "#ff6b4a", 12);
+        if (p.hp <= 0) {
+          p.hp = 0;
+          state.gameOver = true;
+          state.message = "파티가 쓰러졌습니다. R로 재도전하세요.";
+          state.messageTime = 999;
+        }
+        updateStatus();
+      }
+
+      function update() {
+        state.time++;
+        const p = state.player;
+
+        if (wasPressed("r")) reset();
+        if (state.gameOver || state.won) {
+          if (wasPressed("r")) reset();
+          tickEffects();
+          pressed.clear();
+          return;
+        }
+
+        if (wasPressed("1")) { state.selected = 0; applyRoleStats(); }
+        if (wasPressed("2")) { state.selected = 1; applyRoleStats(); }
+        if (wasPressed("3")) { state.selected = 2; applyRoleStats(); }
+        if (wasPressed("4")) { state.selected = 3; applyRoleStats(); }
+        if (wasPressed("5")) { state.selected = 4; applyRoleStats(); }
+
+        const left = isDown("a", "arrowleft", "left");
+        const right = isDown("d", "arrowright", "right");
+        const speed = role().speed;
+        if (left) {
+          p.vx -= 0.65;
+          p.facing = -1;
+        }
+        if (right) {
+          p.vx += 0.65;
+          p.facing = 1;
+        }
+        p.vx *= p.onGround ? 0.78 : 0.91;
+        p.vx = Math.max(-speed, Math.min(speed, p.vx));
+
+        if (wasPressed("w", "space", "arrowup", "jump") && p.onGround) {
+          p.vy = -13.5;
+          p.onGround = false;
+        }
+        if (wasPressed("j", "attack")) attack();
+        if (wasPressed("k", "skill")) skill();
+
+        p.vy += gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.x = Math.max(0, Math.min(worldW - p.w, p.x));
+        collidePlatforms(p);
+
+        if (p.y > H + 120) {
+          p.x = Math.max(40, state.camera + 60);
+          p.y = 120;
+          p.vy = 0;
+          hurt(18, p.x + 100);
+        }
+
+        for (const h of hazards) {
+          if (rects(p, h)) hurt(12, h.x + h.w / 2);
+        }
+
+        updateEnemies();
+        updateBoss();
+        tickEffects();
+
+        p.attackCd = Math.max(0, p.attackCd - 1);
+        p.skillCd = Math.max(0, p.skillCd - 1);
+        p.invuln = Math.max(0, p.invuln - 1);
+        p.actionTime = Math.max(0, (p.actionTime || 0) - 1);
+        p.mp = Math.min(p.maxMp, p.mp + 0.08);
+        if (state.messageTime > 0) state.messageTime--;
+        if (state.levelToast) {
+          state.levelToast.life--;
+          if (state.levelToast.life <= 0) state.levelToast = null;
+        }
+        if (state.shake > 0) state.shake--;
+        state.camera += (Math.max(0, Math.min(worldW - W, p.x - W * 0.38)) - state.camera) * 0.08;
+        pressed.clear();
+        updateStatus();
+      }
+
+      function collidePlatforms(obj) {
+        obj.onGround = false;
+        for (const pl of platforms) {
+          if (obj.x + obj.w > pl.x && obj.x < pl.x + pl.w) {
+            const wasAbove = obj.y + obj.h - obj.vy <= pl.y;
+            if (obj.y + obj.h >= pl.y && obj.y + obj.h <= pl.y + pl.h && obj.vy >= 0 && wasAbove) {
+              obj.y = pl.y - obj.h;
+              obj.vy = 0;
+              obj.onGround = true;
+            }
+          }
+        }
+      }
+
+      function updateEnemies() {
+        const p = state.player;
+        for (const e of state.enemies) {
+          if (!e.alive) continue;
+          if (e.type === "bat") {
+            e.y = e.baseY + Math.sin(state.time / 24 + e.x * 0.01) * 24;
+            e.x += Math.sign(p.x - e.x) * e.speed;
+          } else {
+            e.x += e.vx;
+            if (Math.abs(e.x - (e.spawnX || e.x)) > 170) e.vx *= -1;
+            if (!e.spawnX) e.spawnX = e.x;
+          }
+          if (Math.abs(p.x - e.x) < 260) e.vx = Math.sign(p.x - e.x) * Math.abs(e.speed || 0.6);
+          if (rects(p, e)) hurt(e.dmg, e.x);
+          e.hit = Math.max(0, e.hit - 1);
+        }
+      }
+
+      function updateBoss() {
+        const b = state.boss;
+        const p = state.player;
+        if (!b.alive) return;
+        b.phase = b.hp < b.maxHp * 0.45 ? 2 : 1;
+        if (Math.abs(p.x - b.x) < 520) {
+          b.x += Math.sign(p.x - b.x) * (b.phase === 2 ? 1.15 : 0.7);
+          b.cd--;
+          if (b.cd <= 0) {
+            b.cd = b.phase === 2 ? 70 : 100;
+            const box = { x: b.x - 50, y: b.y + 28, w: 190, h: 66 };
+            state.attacks.push({ ...box, life: 18, color: "#ff6a2a", enemy: true });
+            if (rects(p, box)) hurt(b.phase === 2 ? 24 : 17, b.x);
+          }
+        }
+        if (rects(p, b)) hurt(15, b.x);
+        b.hit = Math.max(0, b.hit - 1);
+      }
+
+      function tickEffects() {
+        state.attacks = state.attacks.filter(a => --a.life > 0);
+        for (const pt of state.particles) {
+          pt.x += pt.vx;
+          pt.y += pt.vy;
+          pt.vy += 0.24;
+          pt.life--;
+        }
+        state.particles = state.particles.filter(p => p.life > 0);
+        for (const pk of state.pickups) {
+          pk.y += pk.vy;
+          pk.vy += 0.18;
+          pk.life--;
+        }
+        state.pickups = state.pickups.filter(p => p.life > 0);
+      }
+
+      function draw() {
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+        const shakeX = state.shake ? (Math.random() - 0.5) * state.shake : 0;
+        const shakeY = state.shake ? (Math.random() - 0.5) * state.shake : 0;
+        ctx.clearRect(0, 0, W, H);
+        ctx.translate(shakeX, shakeY);
+        drawBackground();
+        ctx.save();
+        ctx.translate(-Math.floor(state.camera), 0);
+        drawWorld();
+        drawEntities();
+        ctx.restore();
+        drawHud();
+        ctx.restore();
+      }
+
+      function drawBackground() {
+        ctx.drawImage(assets.worldBg, Math.floor(state.camera), 0, W, H, 0, 0, W, H);
+      }
+
+      function drawWorld() {
+        for (const pl of platforms) {
+          drawStonePlatform(pl);
+        }
+        for (const h of hazards) {
+          rect(h.x, h.y + 28, h.w, 16, "#5c3425");
+          for (let x = h.x; x < h.x + h.w; x += 24) {
+            tri(x + 12, h.y + 34, 24, 34, "#b9937a");
+            tri(x + 12, h.y + 34, 13, 24, "#f0c8a0");
+          }
+        }
+      }
+
+      function drawStonePlatform(pl) {
+        rect(pl.x, pl.y, pl.w, 7, "#8a7858");
+        rect(pl.x, pl.y + 7, pl.w, 7, "#4d432f");
+        rect(pl.x, pl.y + 14, pl.w, pl.h - 14, "#2b261f");
+        for (let y = pl.y + 16; y < pl.y + pl.h; y += 18) {
+          const offset = Math.floor((y - pl.y) / 18) % 2 ? 22 : 0;
+          for (let x = pl.x - offset; x < pl.x + pl.w; x += 44) {
+            const w = 38 + ((x + y) % 3) * 4;
+            rect(x, y, w, 14, (x + y) % 4 ? "#4d4437" : "#615542");
+            rect(x + 3, y + 2, Math.max(8, w - 12), 2, "rgba(212,188,137,.18)");
+            rect(x, y + 13, w, 2, "rgba(0,0,0,.22)");
+          }
+        }
+        for (let x = pl.x + 8; x < pl.x + pl.w; x += 54) {
+          rect(x, pl.y - 7, 22, 7, "#4f7c3a");
+          rect(x + 14, pl.y - 10, 6, 10, "#5b9348");
+        }
+      }
+
+      function drawEntities() {
+        for (const pk of state.pickups) {
+          text(pk.text, pk.x - 18, pk.y, "#ffe96a", 18);
+        }
+        for (const a of state.attacks) {
+          ctx.globalAlpha = Math.min(1, a.life / 8);
+          rect(a.x, a.y, a.w, a.h, a.color);
+          ctx.globalAlpha = 1;
+        }
+        for (const e of state.enemies) if (e.alive) drawEnemy(e);
+        if (state.boss.alive) drawBoss(state.boss);
+        drawPlayer();
+        for (const pt of state.particles) {
+          ctx.globalAlpha = Math.max(0, pt.life / 30);
+          rect(pt.x, pt.y, 6, 6, pt.color);
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      function drawPlayer() {
+        const p = state.player;
+        const flicker = p.invuln > 0 && state.time % 6 < 3;
+        if (flicker) ctx.globalAlpha = 0.45;
+        const actionAsset = assets[roleActionAssetKeys[role().id]];
+        if (actionAsset) {
+          drawRoleAction(actionAsset, playerActionForRole(), p.x - 58, p.y - 82, 178, 154, p.facing);
+        } else {
+          drawHeroImage(state.selected, p.x - 48, p.y - 74, 156, 146, p.facing);
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function drawRoleAction(sheet, action, x, y, w, h, facing) {
+        const anim = actionAnimations[action] || actionAnimations.idle;
+        const frame = Math.floor(state.time / anim.speed) % anim.frames;
+        const sx = frame * ACTION_FRAME_W;
+        const sy = anim.row * ACTION_FRAME_H;
+        if (facing < 0) {
+          ctx.save();
+          ctx.translate(x + w, y);
+          ctx.scale(-1, 1);
+          ctx.drawImage(sheet, sx, sy, ACTION_FRAME_W, ACTION_FRAME_H, 0, 0, w, h);
+          ctx.restore();
+        } else {
+          ctx.drawImage(sheet, sx, sy, ACTION_FRAME_W, ACTION_FRAME_H, x, y, w, h);
+        }
+      }
+
+      function drawHeroImage(index, x, y, w, h, facing) {
+        if (facing < 0) {
+          ctx.save();
+          ctx.translate(x + w, y);
+          ctx.scale(-1, 1);
+          ctx.drawImage(assets.heroes, index * HERO_FRAME_W, 0, HERO_FRAME_W, HERO_FRAME_H, 0, 0, w, h);
+          ctx.restore();
+        } else {
+          ctx.drawImage(assets.heroes, index * HERO_FRAME_W, 0, HERO_FRAME_W, HERO_FRAME_H, x, y, w, h);
+        }
+      }
+
+      function drawEnemy(e) {
+        const frame = {
+          slime: { sx: 0, sy: 0, sw: 120, sh: 120, dx: -18, dy: -34, dw: 78, dh: 76 },
+          bat: { sx: 120, sy: 0, sw: 120, sh: 120, dx: -28, dy: -34, dw: 92, dh: 70 },
+          golem: { sx: 240, sy: 0, sw: 140, sh: 180, dx: -20, dy: -34, dw: 96, dh: 124 }
+        }[e.type];
+        if (e.hit) ctx.globalAlpha = 0.65;
+        ctx.drawImage(assets.enemies, frame.sx, frame.sy, frame.sw, frame.sh, e.x + frame.dx, e.y + frame.dy, frame.dw, frame.dh);
+        ctx.globalAlpha = 1;
+        drawBar(e.x, e.y - 12, e.w, 6, e.hp / e.maxHp, "#d84b3f");
+      }
+
+      function drawBoss(b) {
+        if (b.hit) ctx.globalAlpha = 0.68;
+        ctx.drawImage(assets.boss, b.x - 48, b.y - 42, 190, 224);
+        ctx.globalAlpha = 1;
+      }
+
+      function drawHud() {
+        const p = state.player;
+        const r = role();
+        panel(18, 16, 276, 92);
+        text(`${r.name} · ${r.skill}`, 34, 42, "#ffe7a5", 20);
+        drawBar(34, 56, 230, 14, p.hp / p.maxHp, "#65d84f");
+        drawBar(34, 78, 230, 12, p.mp / p.maxMp, "#4ca6d8");
+        panel(18, 118, 542, 122);
+        ctx.drawImage(assets.roster, 28, 126);
+        stroke(28 + state.selected * 100, 126, 88, 104, "#ffe96a", 3);
+        drawStageProgress();
+
+        if (state.boss.alive && Math.abs(p.x - state.boss.x) < 720) {
+          panel(390, 18, 500, 58);
+          text("화염 파수꾼", 412, 42, "#ffe7a5", 18);
+          drawBar(540, 34, 320, 16, state.boss.hp / state.boss.maxHp, "#d84b3f");
+        }
+
+        panel(940, 16, 316, 132);
+        text("퀘스트", 960, 43, "#e8ae4a", 20);
+        state.quests.forEach((q, i) => {
+          const done = q.done >= q.need;
+          text(`${done ? "✓" : "□"} ${q.text} ${q.done}/${q.need}`, 960, 70 + i * 24, done ? "#9aff74" : "#f8e6bb", 16);
+        });
+
+        if (state.messageTime > 0) {
+          panel(270, 590, 740, 78);
+          text(state.message, 298, 638, "#f8e6bb", 21);
+        }
+
+        if (state.levelToast && !state.won && !state.gameOver) drawLevelToast();
+
+        if (state.won) {
+          drawRewardModal();
+        } else if (state.gameOver) {
+          ctx.fillStyle = "rgba(0,0,0,.52)";
+          ctx.fillRect(0, 0, W, H);
+          panel(390, 250, 500, 170);
+          text("GAME OVER", 516, 320, "#ff7b68", 44);
+          text("R 또는 처음부터 버튼으로 다시 시작", 468, 366, "#f8e6bb", 20);
+        }
+      }
+
+      function drawStageProgress() {
+        const progress = Math.max(0, Math.min(1, state.player.x / (worldW - 360)));
+        panel(365, 650, 540, 44);
+        text("1장: 불의 지배", 386, 678, "#e8ae4a", 17);
+        drawBar(520, 665, 250, 12, progress, "#4ca6d8");
+        for (let i = 0; i < 3; i++) {
+          star(804 + i * 28, 673, i < state.stageStars ? "#ffe060" : "#4a3a2a", 13);
+        }
+      }
+
+      function drawLevelToast() {
+        const t = state.levelToast;
+        const alpha = Math.min(1, t.life / 25);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        panel(478, 188, 324, 176);
+        star(640, 235, "#ffe060", 52);
+        text(String(t.level), 625, 252, "#ffffff", 42);
+        text("새로운 팀 레벨!", 538, 312, "#f8e6bb", 28);
+        text(`최대 마나 ${state.player.maxMp - 8} >> ${state.player.maxMp}`, 536, 344, "#9aff74", 17);
+        ctx.restore();
+      }
+
+      function drawRewardModal() {
+        ctx.fillStyle = "rgba(0,0,0,.62)";
+        ctx.fillRect(0, 0, W, H);
+        panel(315, 118, 650, 500);
+        ribbon(405, 130, 470, 76);
+        text("승리!", 588, 184, "#fff05e", 52);
+        for (let i = 0; i < 3; i++) star(578 + i * 44, 229, "#ffe060", 22);
+        panel(414, 252, 452, 70);
+        text(`레벨: ${state.teamLevel}`, 462, 296, "#f8e6bb", 24);
+        text(`경험치: +65`, 610, 296, "#f8e6bb", 24);
+        text(`골드: +${state.rewardItems[0].qty}`, 740, 296, "#ffe060", 24);
+        text("전리품", 596, 364, "#ffe060", 26);
+        state.rewardItems.forEach((item, i) => {
+          const x = 438 + i * 106;
+          lootIcon(x, 390, item);
+        });
+        rect(540, 538, 200, 54, "#56bd28");
+        stroke(540, 538, 200, 54, "#f8e6bb", 3);
+        text("확인", 612, 574, "#f8e6bb", 27);
+        text("R 또는 처음부터 버튼으로 다시 시작", 486, 635, "#c9ad75", 17);
+      }
+
+      function panel(x, y, w, h) {
+        rect(x, y, w, h, "rgba(13,18,22,.86)");
+        stroke(x, y, w, h, "#a97835", 3);
+      }
+
+      function drawBar(x, y, w, h, ratio, color) {
+        rect(x, y, w, h, "#2a160f");
+        rect(x + 2, y + 2, Math.max(0, (w - 4) * ratio), h - 4, color);
+        stroke(x, y, w, h, "#160b06", 2);
+      }
+
+      function star(x, y, color, radius) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+          const a = -Math.PI / 2 + i * Math.PI / 5;
+          const r = i % 2 ? radius * 0.45 : radius;
+          ctx.lineTo(Math.round(x + Math.cos(a) * r), Math.round(y + Math.sin(a) * r));
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#7c4a17";
+        ctx.lineWidth = Math.max(2, radius * 0.12);
+        ctx.stroke();
+      }
+
+      function ribbon(x, y, w, h) {
+        rect(x + 38, y, w - 76, h, "#b51717");
+        rect(x + 38, y, w - 76, 12, "#ffdc3b");
+        rect(x + 38, y + h - 12, w - 76, 12, "#8f1111");
+        tri(x + 40, y + h / 2, 78, h, "#d52118");
+        tri(x + w - 40, y + h / 2, 78, h, "#d52118");
+        stroke(x + 38, y, w - 76, h, "#ffdc3b", 3);
+      }
+
+      function lootIcon(x, y, item) {
+        panel(x, y, 72, 72);
+        rect(x + 14, y + 14, 44, 44, item.color);
+        rect(x + 22, y + 22, 28, 28, "rgba(255,255,255,.28)");
+        text(String(item.qty), x + 52, y + 63, "#fff7b5", 18);
+        text(item.name, x - 4, y + 96, "#f8e6bb", 15);
+      }
+
+      function rect(x, y, w, h, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+      }
+
+      function stroke(x, y, w, h, color, size) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = size;
+        ctx.strokeRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+      }
+
+      function tri(x, y, w, h, color) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(Math.round(x), Math.round(y - h));
+        ctx.lineTo(Math.round(x - w / 2), Math.round(y));
+        ctx.lineTo(Math.round(x + w / 2), Math.round(y));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function text(t, x, y, color, size) {
+        ctx.fillStyle = color;
+        ctx.font = `900 ${size}px Apple SD Gothic Neo, Malgun Gothic, sans-serif`;
+        ctx.fillText(t, x, y);
+      }
+
+      function label(g, t, x, y, color, size) {
+        g.fillStyle = color;
+        g.font = `900 ${size}px Apple SD Gothic Neo, Malgun Gothic, sans-serif`;
+        g.fillText(t, x, y);
+      }
+
+      function loop() {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      loadAssets()
+        .then(() => {
+          buildRoster();
+          reset();
+          requestAnimationFrame(loop);
+        })
+        .catch(error => {
+          statusEl.textContent = error.message;
+        });
+    })();
+  </script>
+</body>
+</html>

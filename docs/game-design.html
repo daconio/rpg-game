@@ -1,0 +1,6108 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>해커톤 대모험: 픽셀아트 웹 RPG 기획서</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10151a;
+      --panel: #171d22;
+      --panel-2: #20272e;
+      --ink: #f8e6bb;
+      --muted: #c4ad82;
+      --line: #a97835;
+      --line-soft: rgba(169, 120, 53, 0.38);
+      --accent: #e8ae4a;
+      --red: #c4564e;
+      --blue: #4c8bc4;
+      --green: #6f9f5b;
+      --violet: #8f6bc5;
+      --white-gold: #f0dca0;
+      --shadow: rgba(0, 0, 0, 0.38);
+      --radius: 8px;
+      font-family: "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(184, 107, 44, 0.13), transparent 28rem),
+        radial-gradient(circle at 86% 18%, rgba(107, 86, 176, 0.13), transparent 24rem),
+        linear-gradient(180deg, #0b1014 0%, var(--bg) 42%, #0b1014 100%);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 64px;
+    }
+
+    header {
+      min-height: 88vh;
+      display: grid;
+      align-content: center;
+      gap: 28px;
+      border-bottom: 1px solid var(--line-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(16, 21, 26, 0.05) 0%, rgba(16, 21, 26, 0.34) 58%, rgba(16, 21, 26, 0.94) 100%),
+        linear-gradient(135deg, rgba(18, 106, 124, 0.68), rgba(28, 83, 98, 0.2) 44%, rgba(91, 45, 106, 0.32)),
+        repeating-linear-gradient(90deg, transparent 0 118px, rgba(248, 230, 187, 0.025) 118px 120px);
+      pointer-events: none;
+    }
+
+    header::after {
+      content: "";
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 90px;
+      background: linear-gradient(180deg, transparent, rgba(16, 21, 26, 0.96));
+      pointer-events: none;
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: absolute;
+      z-index: 2;
+      top: 24px;
+      left: 0;
+      right: 0;
+    }
+
+    .brand-mark {
+      font-weight: 950;
+      color: var(--ink);
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.42);
+    }
+
+    .online {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(104, 226, 40, 0.32);
+      background: rgba(7, 14, 17, 0.48);
+      color: #86f33d;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.86rem;
+      font-weight: 950;
+    }
+
+    .online span {
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+      gap: 28px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 800;
+      letter-spacing: 0;
+      margin: 0 0 12px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      letter-spacing: 0;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.8rem, 8vw, 6.2rem);
+      max-width: 9ch;
+      text-shadow: 0 6px 0 rgba(0, 0, 0, 0.45), 0 0 22px rgba(232, 174, 74, 0.16);
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      margin-bottom: 18px;
+    }
+
+    h3 {
+      font-size: 1.12rem;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .hero-copy {
+      max-width: 680px;
+      color: #e8d3a6;
+      font-size: 1.08rem;
+    }
+
+    .reward-board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 620px;
+      margin-top: 24px;
+    }
+
+    .reward-step {
+      min-height: 210px;
+      border: 1px solid rgba(248, 230, 187, 0.32);
+      background: linear-gradient(180deg, rgba(34, 122, 104, 0.84), rgba(38, 81, 62, 0.62));
+      clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+      display: grid;
+      justify-items: center;
+      align-content: start;
+      padding: 20px 12px 30px;
+      text-align: center;
+      box-shadow: inset 0 0 24px rgba(248, 230, 187, 0.08), 0 18px 38px rgba(0, 0, 0, 0.22);
+    }
+
+    .reward-step:nth-child(2) {
+      background: linear-gradient(180deg, rgba(151, 116, 52, 0.82), rgba(105, 83, 51, 0.62));
+    }
+
+    .reward-step:nth-child(3) {
+      background: linear-gradient(180deg, rgba(96, 76, 123, 0.86), rgba(88, 65, 58, 0.62));
+    }
+
+    .reward-num {
+      font-size: 3.5rem;
+      line-height: 1;
+      color: #b4ff31;
+      font-weight: 950;
+      text-shadow: 0 4px 0 rgba(0, 0, 0, 0.34);
+    }
+
+    .reward-step:nth-child(n+2) .reward-num {
+      color: #ffd477;
+    }
+
+    .reward-name {
+      min-height: 52px;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      font-weight: 950;
+      line-height: 1.2;
+    }
+
+    .reward-prize {
+      margin-top: 12px;
+      color: #fff;
+      font-weight: 950;
+      font-size: 1.22rem;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.38);
+    }
+
+    .mission-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .action-stage {
+      position: relative;
+      min-height: 520px;
+      display: grid;
+      align-items: center;
+    }
+
+    .pixel-game-shell {
+      width: min(560px, 100%);
+      margin-left: auto;
+      border: 4px solid #2b1b0d;
+      border-radius: 8px;
+      background: #0b1016;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.46), inset 0 0 0 3px rgba(255, 212, 102, 0.18);
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+      image-rendering: pixelated;
+    }
+
+    .pixel-topbar {
+      min-height: 44px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      background: linear-gradient(180deg, #30200f, #140d07);
+      border-bottom: 3px solid #a97835;
+      color: #ffe7a5;
+      font-weight: 950;
+      font-size: 0.88rem;
+    }
+
+    .pixel-resource {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #fff3c4;
+    }
+
+    .pixel-resource::before {
+      content: "";
+      width: 14px;
+      height: 14px;
+      background: #f4c542;
+      box-shadow: 4px 0 #b57920, 0 4px #8a4f19, 4px 4px #f9e07a;
+    }
+
+    .pixel-stage {
+      height: 360px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, #7fc9e8 0 30%, #8fd17d 31% 52%, #4d7d3f 53% 72%, #2e2619 73%);
+    }
+
+    .pixel-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, transparent 0 18%, rgba(255, 255, 255, 0.58) 19% 24%, transparent 25%),
+        radial-gradient(circle at 12% 24%, rgba(255, 245, 143, 0.55), transparent 4rem);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .pixel-mountains {
+      position: absolute;
+      left: -5%;
+      right: -5%;
+      bottom: 134px;
+      height: 128px;
+      background:
+        linear-gradient(135deg, transparent 0 32%, #486e78 33% 48%, transparent 49%),
+        linear-gradient(45deg, transparent 0 38%, #3d5d68 39% 54%, transparent 55%),
+        linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.16));
+      opacity: 0.8;
+    }
+
+    .pixel-forest {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 96px;
+      height: 104px;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 18px, #255f35 18px 42px, transparent 42px 58px),
+        linear-gradient(180deg, transparent 0 18%, #174125 19%);
+      clip-path: polygon(0 42%, 6% 8%, 12% 48%, 18% 12%, 26% 46%, 34% 4%, 42% 44%, 50% 10%, 58% 46%, 68% 8%, 76% 48%, 88% 12%, 100% 40%, 100% 100%, 0 100%);
+    }
+
+    .pixel-ground {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 104px;
+      background:
+        repeating-linear-gradient(90deg, #594022 0 34px, #6d4b26 34px 68px),
+        linear-gradient(180deg, #7d5a2d, #372313);
+      border-top: 7px solid #2d6e2b;
+      box-shadow: inset 0 12px #469c35, inset 0 20px #2f6f2b;
+    }
+
+    .pixel-platform {
+      position: absolute;
+      left: 34%;
+      bottom: 118px;
+      width: 144px;
+      height: 30px;
+      background: repeating-linear-gradient(90deg, #7a5730 0 24px, #5b3b1d 24px 48px);
+      border-top: 6px solid #4aa536;
+      box-shadow: 0 8px 0 #2b1b0d;
+    }
+
+    .pixel-hero,
+    .pixel-ally,
+    .pixel-enemy,
+    .pixel-boss {
+      position: absolute;
+      bottom: 96px;
+      width: 42px;
+      height: 72px;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.28));
+    }
+
+    .pixel-hero {
+      left: 96px;
+    }
+
+    .pixel-ally {
+      left: 46px;
+      transform: scale(0.82);
+      transform-origin: bottom center;
+    }
+
+    .pixel-enemy {
+      right: 164px;
+      transform: scale(0.88);
+      transform-origin: bottom center;
+    }
+
+    .pixel-boss {
+      right: 54px;
+      width: 86px;
+      height: 116px;
+      bottom: 90px;
+    }
+
+    .pixel-hero::before,
+    .pixel-ally::before,
+    .pixel-enemy::before,
+    .pixel-boss::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 0;
+      width: 22px;
+      height: 22px;
+      background: var(--skin, #f1c57f);
+      box-shadow:
+        0 22px var(--armor, #2f65b7),
+        0 44px var(--pants, #1b2736),
+        -10px 24px var(--armor, #2f65b7),
+        10px 24px var(--armor, #2f65b7),
+        -8px 64px #111,
+        14px 64px #111,
+        4px -8px var(--hair, #3b2614),
+        -6px 8px var(--hair, #3b2614);
+    }
+
+    .pixel-ally::before {
+      --armor: #ece7d3;
+      --pants: #b8903f;
+      --hair: #eee3bd;
+    }
+
+    .pixel-enemy::before {
+      --skin: #79a745;
+      --armor: #75352a;
+      --pants: #2a1c18;
+      --hair: #263a1c;
+    }
+
+    .pixel-boss::before {
+      left: 26px;
+      top: 4px;
+      width: 34px;
+      height: 34px;
+      --skin: #653654;
+      --armor: #4b263e;
+      --pants: #22101d;
+      --hair: #19101d;
+      box-shadow:
+        0 34px var(--armor),
+        -20px 40px var(--armor),
+        20px 40px var(--armor),
+        0 70px #251420,
+        -14px 102px #120912,
+        22px 102px #120912,
+        -18px 10px #5f3b88,
+        18px 10px #5f3b88,
+        0 -10px #19101d;
+    }
+
+    .pixel-slash {
+      position: absolute;
+      left: 154px;
+      bottom: 156px;
+      width: 78px;
+      height: 12px;
+      background: #f5f0c0;
+      box-shadow: 8px 8px #f0a73f, 16px 16px rgba(245, 240, 192, 0.5);
+      transform: rotate(-24deg);
+    }
+
+    .pixel-projectile {
+      position: absolute;
+      right: 238px;
+      bottom: 180px;
+      width: 54px;
+      height: 8px;
+      background: #76f4ff;
+      box-shadow: -12px 0 #3277d8, -24px 0 rgba(118, 244, 255, 0.34);
+    }
+
+    .pixel-hud {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: 58px;
+      display: grid;
+      grid-template-columns: 170px 1fr 104px;
+      gap: 12px;
+      z-index: 5;
+    }
+
+    .hud-panel {
+      border: 3px solid #2b1b0d;
+      background: rgba(10, 16, 22, 0.78);
+      box-shadow: inset 0 0 0 2px rgba(255, 230, 153, 0.1);
+      padding: 8px;
+      color: #fff1b8;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .hp-bar,
+    .mana-bar,
+    .boss-bar {
+      height: 12px;
+      border: 2px solid #1a0d05;
+      background: #220e0a;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    .hp-bar span,
+    .mana-bar span,
+    .boss-bar span {
+      display: block;
+      height: 100%;
+      width: var(--fill, 74%);
+      background: linear-gradient(90deg, #28c44d, #b7ff4f);
+    }
+
+    .mana-bar span {
+      background: linear-gradient(90deg, #2f83ef, #77e7ff);
+    }
+
+    .boss-bar span {
+      background: linear-gradient(90deg, #db3630, #ff9c2c);
+    }
+
+    .pixel-quest-mini {
+      border: 3px solid #2b1b0d;
+      background: rgba(12, 28, 48, 0.86);
+      color: #f8e6bb;
+      padding: 8px;
+      font-size: 0.74rem;
+      font-weight: 850;
+    }
+
+    .pixel-bottom-ui {
+      min-height: 108px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: linear-gradient(180deg, #151b20, #0a0e12);
+      border-top: 3px solid #a97835;
+    }
+
+    .pixel-party {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pixel-party-card {
+      width: 64px;
+      height: 76px;
+      border: 3px solid #8c6933;
+      background: linear-gradient(180deg, #243245, #111820);
+      display: grid;
+      place-items: center;
+      color: #ffe7a5;
+      font-size: 0.72rem;
+      font-weight: 950;
+      position: relative;
+    }
+
+    .pixel-party-card.active {
+      border-color: #f6d15d;
+      box-shadow: 0 0 0 3px rgba(246, 209, 93, 0.18);
+    }
+
+    .pixel-party-card::before {
+      content: attr(data-role);
+      position: absolute;
+      top: 7px;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      background: var(--role-color, #4c8bc4);
+      color: #111;
+      font-size: 0.68rem;
+      box-shadow: 4px 4px rgba(0, 0, 0, 0.28);
+    }
+
+    .pixel-skills {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pixel-skill {
+      width: 58px;
+      height: 58px;
+      border: 3px solid #8c6933;
+      background:
+        radial-gradient(circle at 36% 34%, rgba(255, 255, 255, 0.62), transparent 12px),
+        linear-gradient(135deg, var(--skill-a, #143e69), var(--skill-b, #e8ae4a));
+      display: grid;
+      place-items: end center;
+      color: #fff3c4;
+      font-size: 0.7rem;
+      font-weight: 950;
+      padding-bottom: 4px;
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.28);
+    }
+
+    .pixel-caption {
+      padding: 10px 12px;
+      color: #d9c48e;
+      background: rgba(7, 10, 14, 0.86);
+      border-top: 1px solid rgba(169, 120, 53, 0.32);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .reward-page {
+      min-height: 780px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(52, 31, 23, 0.2), rgba(47, 28, 43, 0.7)),
+        linear-gradient(90deg, rgba(13, 18, 22, 0.78), rgba(13, 18, 22, 0.34), rgba(13, 18, 22, 0.78)),
+        radial-gradient(circle at 48% 34%, rgba(240, 187, 76, 0.24), transparent 22rem),
+        linear-gradient(135deg, #2c392f, #3d262b 48%, #211923);
+    }
+
+    .reward-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(7px);
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18), transparent 38%, rgba(0, 0, 0, 0.28)),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 120px);
+    }
+
+    .reward-nav {
+      position: absolute;
+      z-index: 2;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      background: linear-gradient(180deg, rgba(64, 39, 30, 0.92), rgba(52, 34, 28, 0.82));
+      color: #d9a076;
+      font-weight: 950;
+    }
+
+    .reward-logo {
+      color: var(--accent);
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+      line-height: 1;
+    }
+
+    .reward-menu {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 0.9rem;
+    }
+
+    .hamburger {
+      width: 28px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .hamburger i {
+      display: block;
+      height: 3px;
+      border-radius: 999px;
+      background: #d9a076;
+    }
+
+    .reward-modal {
+      width: min(760px, calc(100% - 32px));
+      position: relative;
+      z-index: 1;
+      display: grid;
+      justify-items: center;
+      padding-top: 64px;
+      text-align: center;
+    }
+
+    .victory-ribbon {
+      width: min(660px, 100%);
+      min-height: 104px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      color: #ffe76f;
+      font-size: clamp(2.6rem, 8vw, 4.8rem);
+      font-weight: 950;
+      text-shadow: 0 4px 0 rgba(90, 18, 8, 0.72), 0 0 18px rgba(255, 230, 111, 0.54);
+      background: linear-gradient(180deg, #e71e18, #a80d0c 58%, #710909);
+      border: 5px solid #f6c31c;
+      border-radius: 22px;
+      box-shadow: 0 0 0 2px rgba(101, 31, 8, 0.8), 0 0 40px rgba(247, 190, 38, 0.38);
+    }
+
+    .victory-ribbon::before,
+    .victory-ribbon::after {
+      content: "";
+      position: absolute;
+      top: 27px;
+      width: 112px;
+      height: 58px;
+      background: linear-gradient(180deg, #e71e18, #8c0b0b);
+      border: 4px solid #f6c31c;
+      z-index: -1;
+    }
+
+    .victory-ribbon::before {
+      left: -86px;
+      clip-path: polygon(0 50%, 30% 0, 100% 0, 86% 100%, 30% 100%);
+    }
+
+    .victory-ribbon::after {
+      right: -86px;
+      clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 14% 100%);
+    }
+
+    .stars {
+      display: flex;
+      gap: 8px;
+      margin-top: -10px;
+      filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.52));
+    }
+
+    .star {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(180deg, #fff37a, #f4a91d);
+      clip-path: polygon(50% 0, 62% 34%, 98% 35%, 69% 56%, 80% 92%, 50% 70%, 20% 92%, 31% 56%, 2% 35%, 38% 34%);
+      border: 2px solid #7a3b09;
+    }
+
+    .reward-summary {
+      width: min(700px, 100%);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      margin-top: 14px;
+      border: 2px solid rgba(143, 76, 22, 0.88);
+      border-radius: 8px;
+      background: linear-gradient(90deg, rgba(115, 58, 22, 0.42), rgba(79, 38, 27, 0.68), rgba(115, 58, 22, 0.42));
+      box-shadow: inset 0 0 24px rgba(255, 159, 45, 0.18), 0 14px 34px rgba(0, 0, 0, 0.32);
+      overflow: hidden;
+    }
+
+    .reward-stat {
+      min-height: 92px;
+      display: grid;
+      place-items: center;
+      padding: 10px;
+      border-right: 1px solid rgba(255, 198, 95, 0.18);
+      color: var(--ink);
+      font-weight: 950;
+    }
+
+    .reward-stat:last-child {
+      border-right: 0;
+    }
+
+    .reward-stat small {
+      display: block;
+      color: #ffe1a0;
+      font-size: 1rem;
+      line-height: 1.1;
+    }
+
+    .reward-stat strong {
+      display: block;
+      color: #fff;
+      font-size: 1.7rem;
+      line-height: 1.2;
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.34);
+    }
+
+    .coin-dot {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: -6px;
+      background: radial-gradient(circle at 34% 30%, #fff384, #f9c419 48%, #a75b08);
+      box-shadow: 0 0 0 3px #7d4109, inset 0 0 0 4px rgba(255, 255, 255, 0.24);
+    }
+
+    .hero-reward-card {
+      margin-top: 22px;
+      width: 116px;
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+    }
+
+    .hero-frame {
+      width: 104px;
+      height: 122px;
+      border-radius: 9px;
+      border: 4px solid #9a9fa5;
+      background: linear-gradient(180deg, #2f4154, #141a21);
+      box-shadow: inset 0 0 0 3px #30363d, 0 12px 24px rgba(0, 0, 0, 0.42);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-frame::before {
+      content: "1";
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #d9d9d9, #565d63);
+      color: #fff;
+      padding: 0 18px 3px;
+      border-radius: 0 0 5px 5px;
+      font-weight: 950;
+      z-index: 2;
+    }
+
+    .hero-face {
+      position: absolute;
+      left: 26px;
+      top: 28px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50% 50% 44% 44%;
+      background: #efc37d;
+      box-shadow: inset -9px -4px rgba(0, 0, 0, 0.12);
+    }
+
+    .hero-hair {
+      position: absolute;
+      left: 18px;
+      top: 22px;
+      width: 70px;
+      height: 34px;
+      border-radius: 60% 60% 30% 30%;
+      background: #13213b;
+    }
+
+    .hero-armor {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 0;
+      height: 54px;
+      border-radius: 22px 22px 0 0;
+      background: linear-gradient(90deg, #c53342, #d6e9f4 48%, #2d74bd);
+    }
+
+    .exp-bar {
+      width: 104px;
+      height: 14px;
+      border: 2px solid #753707;
+      background: #1f211c;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .exp-fill {
+      height: 100%;
+      width: 68%;
+      background: linear-gradient(180deg, #61e341, #1e9d26);
+    }
+
+    .exp-label {
+      color: #ffe449;
+      font-weight: 950;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.34);
+    }
+
+    .loot-title {
+      margin: 20px 0 8px;
+      color: #ffe449;
+      font-size: 1.25rem;
+      font-weight: 950;
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.38);
+    }
+
+    .loot-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .loot-item {
+      width: 76px;
+      height: 76px;
+      border-radius: 8px;
+      border: 4px solid #9b9b9b;
+      background: linear-gradient(135deg, #391714, #9d2e1d 54%, #231719);
+      box-shadow: inset 0 0 0 2px #2b2f34, 0 8px 18px rgba(0, 0, 0, 0.34);
+      position: relative;
+      display: grid;
+      place-items: center;
+      color: #ffd971;
+      font-weight: 950;
+      font-size: 1.6rem;
+    }
+
+    .loot-item:nth-child(2) {
+      background: linear-gradient(135deg, #2b160d, #db5217 54%, #ffe064);
+    }
+
+    .loot-item:nth-child(3) {
+      background: linear-gradient(135deg, #2a2418, #c89135 56%, #f8e6bb);
+    }
+
+    .loot-item:nth-child(4) {
+      background: linear-gradient(135deg, #42200d, #f5ae40 52%, #fcebc4);
+    }
+
+    .loot-item:nth-child(5),
+    .loot-item:nth-child(6) {
+      background: linear-gradient(135deg, #5c2a7d, #dfaa2b 50%, #35a4c8);
+    }
+
+    .loot-item b {
+      position: absolute;
+      right: 5px;
+      bottom: 2px;
+      color: #fff;
+      font-size: 1rem;
+      text-shadow: 0 2px 0 #000;
+    }
+
+    .confirm-button {
+      min-width: 210px;
+      min-height: 58px;
+      border-radius: 8px;
+      border: 3px solid #d9a45a;
+      background: linear-gradient(180deg, #8cfb30, #36a812);
+      color: #fff8c8;
+      display: grid;
+      place-items: center;
+      font-size: 1.55rem;
+      font-weight: 950;
+      text-decoration: none;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.24), 0 8px 0 #1c6611, 0 18px 36px rgba(0, 0, 0, 0.34);
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .team-leveling-system {
+      min-height: 760px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(28, 18, 18, 0.24), rgba(38, 24, 35, 0.76)),
+        radial-gradient(circle at 36% 52%, rgba(31, 118, 141, 0.24), transparent 9rem),
+        linear-gradient(135deg, #4c3428, #322126 52%, #1d171a);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 0 0 2px rgba(255, 231, 164, 0.06);
+    }
+
+    .team-leveling-system::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(7px);
+      background:
+        radial-gradient(circle at 50% 28%, rgba(255, 200, 83, 0.22), transparent 19rem),
+        radial-gradient(circle at 50% 75%, rgba(198, 34, 24, 0.24), transparent 16rem),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.36));
+      pointer-events: none;
+    }
+
+    .team-victory-modal {
+      width: min(760px, calc(100% - 34px));
+      position: relative;
+      z-index: 2;
+      display: grid;
+      justify-items: center;
+      text-align: center;
+      padding: 26px 22px 34px;
+    }
+
+    .team-victory-ribbon {
+      width: min(670px, 92%);
+      min-height: 116px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      color: #ffef4c;
+      font-size: clamp(2.5rem, 6vw, 4.6rem);
+      font-weight: 950;
+      line-height: 1;
+      text-shadow: 0 4px 0 #831700, 0 0 22px rgba(255, 239, 76, 0.5);
+      background:
+        linear-gradient(180deg, #f33517 0%, #b60300 58%, #6f0804 100%);
+      border: 4px solid #f3bc24;
+      border-radius: 18px;
+      box-shadow: inset 0 0 0 4px rgba(125, 13, 0, 0.42), 0 0 34px rgba(255, 178, 45, 0.38);
+    }
+
+    .team-victory-ribbon::before,
+    .team-victory-ribbon::after {
+      content: "";
+      position: absolute;
+      top: 24px;
+      width: 130px;
+      height: 78px;
+      background: linear-gradient(180deg, #d51d0d, #7e0a06);
+      border: 4px solid #f3bc24;
+      z-index: -1;
+    }
+
+    .team-victory-ribbon::before {
+      left: -96px;
+      clip-path: polygon(0 18%, 100% 0, 100% 100%, 0 82%, 28% 50%);
+    }
+
+    .team-victory-ribbon::after {
+      right: -96px;
+      clip-path: polygon(0 0, 100% 18%, 72% 50%, 100% 82%, 0 100%);
+    }
+
+    .team-level-stars {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin: -12px 0 8px;
+      filter: drop-shadow(0 5px 0 rgba(0, 0, 0, 0.42));
+    }
+
+    .team-level-summary {
+      width: min(640px, 92%);
+      min-height: 90px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      align-items: center;
+      gap: 0;
+      border: 3px solid rgba(190, 91, 24, 0.82);
+      border-radius: 8px;
+      background: linear-gradient(90deg, rgba(110, 42, 16, 0.54), rgba(83, 34, 19, 0.44));
+      box-shadow: inset 0 0 22px rgba(253, 158, 40, 0.18);
+      color: #fff8d8;
+      margin-bottom: 18px;
+    }
+
+    .team-level-stat {
+      min-height: 72px;
+      display: grid;
+      place-items: center;
+      border-right: 1px solid rgba(255, 200, 109, 0.16);
+    }
+
+    .team-level-stat small {
+      display: block;
+      color: #ffe0a0;
+      font-size: 1.08rem;
+      font-weight: 950;
+    }
+
+    .team-level-stat strong {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 1.58rem;
+      font-weight: 950;
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.32);
+    }
+
+    .info-button {
+      min-width: 120px;
+      height: 58px;
+      margin: 0 12px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      border: 4px solid #cda35a;
+      background: linear-gradient(180deg, #66d9ff, #126cb6);
+      color: #d9f7ff;
+      font-size: 1.55rem;
+      font-weight: 950;
+      box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.2), 0 6px 0 rgba(0, 0, 0, 0.28);
+    }
+
+    .team-exp-row {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      margin: 0 0 14px;
+      flex-wrap: wrap;
+    }
+
+    .team-exp-card {
+      width: 112px;
+      display: grid;
+      justify-items: center;
+      gap: 6px;
+      color: #ffe89b;
+      font-weight: 950;
+      position: relative;
+    }
+
+    .member-card {
+      width: 104px;
+      height: 104px;
+      border-radius: 8px;
+      border: 4px solid #9d6e21;
+      background:
+        radial-gradient(circle at 50% 30%, var(--member-face, #efc18c) 0 27%, transparent 28%),
+        linear-gradient(180deg, var(--member-a, #243d75), var(--member-b, #b82d3b));
+      box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.12), 0 8px 16px rgba(0, 0, 0, 0.34);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .member-card::before {
+      content: attr(data-level);
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 42px;
+      min-height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 0 0 7px 7px;
+      border: 3px solid #b6b0a0;
+      background: linear-gradient(180deg, #4c4c4c, #1d1d1d);
+      color: #fff;
+      font-size: 1.25rem;
+      text-shadow: 0 2px 0 #000;
+      z-index: 2;
+    }
+
+    .member-card::after {
+      content: "★";
+      position: absolute;
+      left: 50%;
+      bottom: -4px;
+      transform: translateX(-50%);
+      color: #ffd12a;
+      font-size: 1.9rem;
+      text-shadow: 0 2px 0 #6a2a02;
+    }
+
+    .member-hair {
+      position: absolute;
+      left: 19px;
+      top: 20px;
+      width: 66px;
+      height: 34px;
+      border-radius: 50% 50% 18% 18%;
+      background: var(--member-hair, #182d44);
+      z-index: 1;
+    }
+
+    .member-body {
+      position: absolute;
+      left: 26px;
+      top: 58px;
+      width: 52px;
+      height: 44px;
+      border-radius: 18px 18px 6px 6px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .member-exp {
+      width: 96px;
+      height: 14px;
+      border: 3px solid #4d2a09;
+      border-radius: 4px;
+      background: #241206;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.32);
+      overflow: hidden;
+    }
+
+    .member-exp span {
+      display: block;
+      height: 100%;
+      width: var(--exp, 64%);
+      background: linear-gradient(90deg, #1bc114, #7cfa31);
+    }
+
+    .exp-gain {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #ffe38c;
+      text-shadow: 0 2px 0 #5c2300;
+    }
+
+    .exp-gain i {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #cfa341, #7b4e0c);
+      color: #fff652;
+      font-size: 0.7rem;
+      font-style: normal;
+      border: 2px solid #efc76b;
+    }
+
+    .team-loot-title {
+      width: min(620px, 90%);
+      margin: 0 auto 10px;
+      border-top: 1px solid rgba(255, 206, 86, 0.26);
+      color: #fff236;
+      font-size: 1.52rem;
+      font-weight: 950;
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.32);
+    }
+
+    .team-loot-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .team-loot-row .loot-item {
+      width: 82px;
+      height: 82px;
+    }
+
+    .hero-detail-page {
+      min-height: 760px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 66% 38%, rgba(101, 181, 210, 0.34), transparent 18rem),
+        linear-gradient(100deg, rgba(8, 66, 72, 0.94) 0 38%, rgba(13, 18, 22, 0.22) 38% 100%),
+        linear-gradient(135deg, #123c46, #24222d 56%, #111418);
+    }
+
+    .hero-detail-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(10, 58, 64, 0.88) 0 38%, transparent 38%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 140px);
+      pointer-events: none;
+    }
+
+    .forest-lines {
+      position: absolute;
+      inset: 0;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .forest-lines span {
+      position: absolute;
+      bottom: 0;
+      width: 8px;
+      height: 78%;
+      background: linear-gradient(180deg, transparent, rgba(10, 25, 30, 0.8));
+      border-radius: 999px;
+      transform-origin: bottom;
+    }
+
+    .forest-lines span:nth-child(1) { left: 54%; transform: rotate(10deg); }
+    .forest-lines span:nth-child(2) { left: 66%; height: 88%; transform: rotate(-8deg); }
+    .forest-lines span:nth-child(3) { left: 81%; height: 72%; transform: rotate(13deg); }
+    .forest-lines span:nth-child(4) { left: 92%; height: 84%; transform: rotate(-12deg); }
+
+    .hero-info-panel {
+      width: min(480px, 48%);
+      min-height: 100%;
+      position: relative;
+      z-index: 2;
+      padding: 72px 42px 40px;
+      background: linear-gradient(100deg, rgba(9, 82, 87, 0.88), rgba(14, 80, 84, 0.72) 72%, transparent);
+      color: var(--ink);
+    }
+
+    .hero-kicker {
+      color: #aaff3c;
+      font-size: 1.3rem;
+      font-weight: 950;
+      margin-bottom: 8px;
+    }
+
+    .hero-name-strip {
+      width: 132%;
+      margin-left: -42px;
+      padding: 12px 42px 18px;
+      background: rgba(9, 91, 95, 0.72);
+      color: #fff;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      line-height: 1.05;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .hero-level {
+      margin: 16px 0 28px;
+      color: #ffd77f;
+      font-size: 1.24rem;
+      font-weight: 950;
+    }
+
+    .hero-meta {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 42px;
+      color: #f4dfb2;
+      font-size: 1.45rem;
+      font-weight: 800;
+    }
+
+    .hero-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .meta-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: #ffdc91;
+      font-weight: 950;
+      font-size: 1.3rem;
+    }
+
+    .skill-title {
+      color: #ffcc82;
+      font-size: 1.35rem;
+      font-weight: 950;
+      margin-bottom: 14px;
+    }
+
+    .skill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .skill-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 7px;
+      border: 3px solid var(--skill-border, #3ca9ff);
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.55), transparent 16px),
+        linear-gradient(135deg, var(--skill-a, #132849), var(--skill-b, #d99c25));
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.35), 0 10px 18px rgba(0, 0, 0, 0.28);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 950;
+      font-size: 1.35rem;
+    }
+
+    .hero-story-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 72px;
+      color: #ffd89b;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .hero-art {
+      position: absolute;
+      z-index: 1;
+      right: 8%;
+      top: 14%;
+      width: min(560px, 50%);
+      height: 620px;
+      filter: drop-shadow(0 26px 32px rgba(0, 0, 0, 0.48));
+    }
+
+    .cape {
+      position: absolute;
+      right: 0;
+      top: 24px;
+      width: 420px;
+      height: 280px;
+      background: linear-gradient(135deg, #17283e, #0c1420);
+      clip-path: polygon(18% 0, 100% 12%, 74% 42%, 100% 88%, 25% 74%, 0 34%);
+      opacity: 0.94;
+      border-radius: 50%;
+    }
+
+    .bow {
+      position: absolute;
+      left: -14px;
+      top: 246px;
+      width: 540px;
+      height: 42px;
+      border: 12px solid #c28a4c;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 50%;
+      transform: rotate(-16deg);
+      box-shadow: 0 0 0 3px rgba(255, 225, 157, 0.32);
+    }
+
+    .bow-string {
+      position: absolute;
+      left: 44px;
+      top: 282px;
+      width: 470px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #ffd58d, transparent);
+      transform: rotate(-16deg);
+      box-shadow: 0 0 14px #ffd58d;
+    }
+
+    .archer-body {
+      position: absolute;
+      left: 218px;
+      top: 196px;
+      width: 122px;
+      height: 230px;
+      background: linear-gradient(180deg, #223654, #1b5b6b 64%, #15282f);
+      border-radius: 56px 56px 34px 34px;
+      transform: rotate(-13deg);
+      box-shadow: inset -18px -18px rgba(0, 0, 0, 0.2);
+    }
+
+    .archer-head {
+      position: absolute;
+      left: 238px;
+      top: 116px;
+      width: 92px;
+      height: 92px;
+      border-radius: 50% 50% 45% 45%;
+      background: #efc18c;
+      transform: rotate(-10deg);
+      overflow: hidden;
+    }
+
+    .archer-head::before {
+      content: "";
+      position: absolute;
+      left: -12px;
+      top: -10px;
+      width: 120px;
+      height: 48px;
+      background: #d6bb73;
+      border-radius: 50%;
+      transform: rotate(-8deg);
+    }
+
+    .hood {
+      position: absolute;
+      left: 204px;
+      top: 78px;
+      width: 168px;
+      height: 142px;
+      background: linear-gradient(135deg, #18324a, #0b1726);
+      clip-path: polygon(50% 0, 96% 44%, 72% 100%, 18% 88%, 0 42%);
+      border-left: 4px solid #c08d42;
+    }
+
+    .arm-a,
+    .arm-b {
+      position: absolute;
+      height: 34px;
+      border-radius: 999px;
+      background: #efc18c;
+      transform-origin: left center;
+      box-shadow: inset -10px -4px rgba(0, 0, 0, 0.18);
+    }
+
+    .arm-a {
+      left: 142px;
+      top: 224px;
+      width: 190px;
+      transform: rotate(-22deg);
+    }
+
+    .arm-b {
+      left: 246px;
+      top: 246px;
+      width: 210px;
+      transform: rotate(8deg);
+    }
+
+    .leg-one,
+    .leg-two {
+      position: absolute;
+      width: 48px;
+      height: 210px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, #1b6270, #0f272d);
+      top: 390px;
+    }
+
+    .leg-one {
+      left: 250px;
+      transform: rotate(-8deg);
+    }
+
+    .leg-two {
+      left: 326px;
+      transform: rotate(-18deg);
+    }
+
+    .hero-close {
+      position: absolute;
+      z-index: 3;
+      top: 32px;
+      right: 32px;
+      color: #ffdc7b;
+      font-size: 3rem;
+      line-height: 1;
+      font-weight: 300;
+    }
+
+    .deploy-button {
+      position: absolute;
+      z-index: 3;
+      right: 142px;
+      bottom: 76px;
+      min-width: 230px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      border-radius: 5px;
+      color: rgba(255, 226, 141, 0.76);
+      background: rgba(65, 130, 42, 0.45);
+      border: 1px solid rgba(146, 224, 100, 0.22);
+      font-size: 1.45rem;
+      font-weight: 900;
+    }
+
+    .swap-button {
+      position: absolute;
+      z-index: 3;
+      right: 38px;
+      bottom: 72px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 5px solid #f3d790;
+      color: #f3d790;
+      display: grid;
+      place-items: center;
+      font-size: 2.4rem;
+      font-weight: 950;
+      background: rgba(10, 22, 25, 0.42);
+    }
+
+    .stage-page {
+      min-height: 760px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(70, 38, 21, 0.34), rgba(28, 19, 18, 0.28)),
+        linear-gradient(90deg, #2f6d37 0 43%, #61532d 43% 58%, #3b2925 58% 100%);
+      box-shadow: inset 0 0 0 2px rgba(255, 231, 164, 0.08);
+    }
+
+    .stage-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 28%, rgba(98, 205, 91, 0.56), transparent 17rem),
+        radial-gradient(circle at 35% 18%, rgba(66, 174, 209, 0.42), transparent 14rem),
+        radial-gradient(circle at 72% 60%, rgba(244, 76, 21, 0.48), transparent 18rem),
+        linear-gradient(90deg, rgba(12, 44, 36, 0.18), rgba(0, 0, 0, 0.36));
+      pointer-events: none;
+    }
+
+    .stage-top-bar {
+      position: absolute;
+      z-index: 5;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(620px, calc(100% - 110px));
+      min-height: 64px;
+      display: grid;
+      place-items: center;
+      color: #f7dfae;
+      font-size: clamp(1.35rem, 3vw, 2.3rem);
+      font-weight: 950;
+      background: linear-gradient(180deg, #714013, #2b180b);
+      border: 3px solid #b58b52;
+      border-radius: 14px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.36), inset 0 0 0 2px rgba(255, 231, 164, 0.16);
+    }
+
+    .stage-top-bar::before,
+    .stage-top-bar::after {
+      content: "";
+      position: absolute;
+      width: 86px;
+      height: 70px;
+      top: -6px;
+      background: linear-gradient(135deg, #c4ab80, #75512e);
+      clip-path: polygon(0 50%, 42% 0, 100% 0, 66% 50%, 100% 100%, 42% 100%);
+      opacity: 0.9;
+    }
+
+    .stage-top-bar::before {
+      left: -72px;
+    }
+
+    .stage-top-bar::after {
+      right: -72px;
+      transform: scaleX(-1);
+    }
+
+    .stage-close {
+      position: absolute;
+      z-index: 6;
+      top: 26px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #74362a;
+      border: 4px solid #c69b5c;
+      color: #ffe199;
+      font-size: 2rem;
+      font-weight: 950;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.34);
+    }
+
+    .map-region {
+      position: absolute;
+      inset: 96px 0 70px;
+    }
+
+    .river {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 78px;
+      height: 96px;
+      background: linear-gradient(180deg, #55c1d6, #117b99);
+      clip-path: polygon(0 36%, 15% 18%, 30% 50%, 46% 20%, 62% 46%, 79% 14%, 100% 30%, 100% 72%, 82% 52%, 64% 80%, 45% 52%, 30% 82%, 12% 48%, 0 70%);
+      opacity: 0.86;
+      box-shadow: inset 0 16px 20px rgba(255, 255, 255, 0.18), 0 10px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .waterfall {
+      position: absolute;
+      left: 17%;
+      top: 34px;
+      width: 76px;
+      height: 148px;
+      background: linear-gradient(90deg, transparent, rgba(188, 246, 255, 0.85), rgba(59, 185, 218, 0.78), transparent);
+      border-radius: 0 0 40px 40px;
+      filter: blur(0.2px);
+    }
+
+    .stage-path {
+      position: absolute;
+      left: 8%;
+      right: 12%;
+      top: 240px;
+      height: 280px;
+      border: 18px solid transparent;
+      border-bottom-color: rgba(196, 154, 87, 0.86);
+      border-left-color: rgba(196, 154, 87, 0.86);
+      border-radius: 0 0 0 75%;
+      transform: rotate(-8deg);
+    }
+
+    .burnt-zone {
+      position: absolute;
+      right: -2%;
+      bottom: 0;
+      width: 54%;
+      height: 58%;
+      background:
+        radial-gradient(circle at 22% 28%, #f26b1d 0 14px, transparent 30px),
+        radial-gradient(circle at 62% 42%, #ed4d1a 0 18px, transparent 34px),
+        radial-gradient(circle at 78% 70%, #ff7c20 0 15px, transparent 32px),
+        linear-gradient(135deg, rgba(46, 38, 33, 0.95), rgba(86, 43, 29, 0.92));
+      clip-path: polygon(14% 0, 100% 6%, 100% 100%, 0 100%, 0 28%);
+      opacity: 0.92;
+    }
+
+    .tree {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-bottom: 58px solid #1f6d37;
+      filter: drop-shadow(0 9px 0 rgba(0, 0, 0, 0.16));
+    }
+
+    .tree::after {
+      content: "";
+      position: absolute;
+      left: -5px;
+      top: 50px;
+      width: 10px;
+      height: 24px;
+      background: #60411f;
+    }
+
+    .tree:nth-child(1) { left: 8%; top: 140px; transform: scale(1.1); }
+    .tree:nth-child(2) { left: 14%; top: 250px; transform: scale(0.9); }
+    .tree:nth-child(3) { left: 23%; top: 190px; transform: scale(1.25); }
+    .tree:nth-child(4) { left: 31%; top: 300px; transform: scale(0.95); }
+    .tree:nth-child(5) { left: 42%; top: 130px; transform: scale(0.85); }
+    .tree:nth-child(6) { left: 51%; top: 228px; transform: scale(0.9); }
+
+    .stage-node {
+      position: absolute;
+      width: 54px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 35%, #46505f, #1c2028 68%);
+      border: 5px solid #b99b6b;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.34), inset 0 0 0 3px rgba(255, 255, 255, 0.08);
+    }
+
+    .stage-node.active {
+      background: radial-gradient(circle at 50% 35%, #4c93ff, #1a3d80 68%);
+      box-shadow: 0 0 0 10px rgba(161, 255, 77, 0.38), 0 0 36px rgba(171, 255, 72, 0.76);
+    }
+
+    .node-1 { left: 12%; bottom: 198px; }
+    .node-2 { left: 27%; bottom: 245px; }
+    .node-3 { left: 42%; bottom: 182px; }
+    .node-4 { right: 34%; bottom: 168px; }
+    .node-5 { right: 17%; bottom: 112px; }
+
+    .boss-node {
+      position: absolute;
+      right: 9%;
+      bottom: 205px;
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 6px solid #b99b6b;
+      background: radial-gradient(circle at 45% 35%, #f3582c, #5c1915 70%);
+      display: grid;
+      place-items: center;
+      color: #ffdf78;
+      font-weight: 950;
+      box-shadow: 0 14px 24px rgba(0, 0, 0, 0.38);
+    }
+
+    .chapter-card {
+      position: absolute;
+      z-index: 4;
+      left: 6%;
+      bottom: 180px;
+      width: 150px;
+      height: 124px;
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 8px;
+      border-radius: 14px;
+      background: rgba(35, 46, 36, 0.86);
+      border: 3px solid #9b875c;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.34);
+    }
+
+    .chapter-portrait {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      border: 4px solid #b4854e;
+      background: linear-gradient(135deg, #3a1e18, #db8e42 48%, #4aa4a8);
+    }
+
+    .chapter-stars {
+      color: #ffd13f;
+      font-size: 1.7rem;
+      line-height: 1;
+      text-shadow: 0 3px 0 #271507;
+    }
+
+    .dialogue-box {
+      position: absolute;
+      z-index: 5;
+      right: 4%;
+      bottom: 210px;
+      width: min(600px, 56%);
+      min-height: 168px;
+      border-radius: 16px;
+      border: 4px solid #e7cc86;
+      background: rgba(44, 23, 10, 0.92);
+      box-shadow: 0 0 24px rgba(255, 227, 139, 0.28), 0 16px 30px rgba(0, 0, 0, 0.36);
+      padding: 26px 160px 24px 26px;
+    }
+
+    .speech-bubble {
+      min-height: 74px;
+      background: #fff8d4;
+      border-radius: 16px 16px 16px 4px;
+      color: #6d5134;
+      display: flex;
+      align-items: center;
+      padding: 0 22px;
+      font-size: 1.18rem;
+      font-weight: 800;
+      position: relative;
+    }
+
+    .speech-bubble::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      bottom: 10px;
+      border-left: 28px solid #fff8d4;
+      border-top: 18px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+
+    .guide-character {
+      position: absolute;
+      right: -10px;
+      bottom: -6px;
+      width: 150px;
+      height: 180px;
+    }
+
+    .guide-character::before {
+      content: "";
+      position: absolute;
+      left: 44px;
+      top: 16px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #e8b681;
+    }
+
+    .guide-character::after {
+      content: "";
+      position: absolute;
+      left: 22px;
+      bottom: 0;
+      width: 108px;
+      height: 126px;
+      border-radius: 42px 42px 12px 12px;
+      background: linear-gradient(90deg, #273e70, #b82d3b 68%, #394e78);
+      box-shadow: inset -18px -12px rgba(0, 0, 0, 0.22);
+    }
+
+    .stage-bottom {
+      position: absolute;
+      z-index: 6;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 72px;
+      display: grid;
+      grid-template-columns: 140px 1fr repeat(3, 170px);
+      align-items: center;
+      gap: 16px;
+      padding: 0 22px;
+      background: linear-gradient(180deg, #59361c, #24150b);
+      border-top: 4px solid #96714a;
+      color: #ffd34f;
+      font-size: 1.2rem;
+      font-weight: 950;
+    }
+
+    .progress-track {
+      height: 34px;
+      border-radius: 7px;
+      background: #1f1c19;
+      border: 3px solid #9b875c;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 42%;
+      height: 100%;
+      background: linear-gradient(180deg, #66a9ff, #2853bf);
+    }
+
+    .stage-steps-page {
+      min-height: 760px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(64, 35, 19, 0.28), rgba(27, 18, 16, 0.36)),
+        linear-gradient(90deg, #2b6f35 0 34%, #456d2d 34% 52%, #392a26 52% 78%, #779235 78% 100%);
+      box-shadow: inset 0 0 0 2px rgba(255, 231, 164, 0.08);
+    }
+
+    .stage-steps-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 11% 34%, rgba(99, 205, 91, 0.58), transparent 18rem),
+        radial-gradient(circle at 26% 20%, rgba(70, 184, 218, 0.44), transparent 14rem),
+        radial-gradient(circle at 64% 64%, rgba(245, 77, 21, 0.56), transparent 19rem),
+        radial-gradient(circle at 91% 48%, rgba(184, 205, 74, 0.44), transparent 15rem),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.42));
+      pointer-events: none;
+    }
+
+    .stage-steps-page::after {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      background:
+        radial-gradient(circle at 9% 55%, transparent 0 88px, rgba(27, 18, 16, 0.24) 89px 94px, transparent 95px),
+        radial-gradient(circle at 87% 58%, transparent 0 90px, rgba(27, 18, 16, 0.24) 91px 96px, transparent 97px);
+      pointer-events: none;
+    }
+
+    .steps-map {
+      position: absolute;
+      inset: 88px 0 70px;
+      z-index: 2;
+    }
+
+    .steps-river {
+      position: absolute;
+      left: -2%;
+      right: -2%;
+      top: 54px;
+      height: 112px;
+      background: linear-gradient(180deg, #5fc6dd, #137d98);
+      clip-path: polygon(0 26%, 14% 16%, 28% 45%, 42% 18%, 58% 42%, 72% 16%, 88% 36%, 100% 22%, 100% 62%, 84% 50%, 66% 76%, 50% 54%, 34% 82%, 18% 52%, 0 70%);
+      opacity: 0.82;
+      box-shadow: inset 0 16px 22px rgba(255, 255, 255, 0.16), 0 10px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .steps-path {
+      position: absolute;
+      left: 8%;
+      right: 7%;
+      top: 300px;
+      height: 250px;
+      border: 17px solid rgba(197, 154, 86, 0.88);
+      border-top: 0;
+      border-right-width: 20px;
+      border-radius: 0 0 56% 56%;
+      transform: rotate(-4deg);
+      opacity: 0.92;
+    }
+
+    .steps-burn-zone {
+      position: absolute;
+      left: 42%;
+      right: 16%;
+      bottom: 0;
+      height: 62%;
+      background:
+        radial-gradient(circle at 18% 24%, #fb7422 0 15px, transparent 32px),
+        radial-gradient(circle at 47% 42%, #f04f1b 0 18px, transparent 36px),
+        radial-gradient(circle at 72% 22%, #ff8229 0 16px, transparent 34px),
+        radial-gradient(circle at 84% 76%, #ff6b1d 0 13px, transparent 30px),
+        linear-gradient(135deg, rgba(48, 39, 33, 0.96), rgba(93, 43, 28, 0.94));
+      clip-path: polygon(14% 0, 100% 5%, 96% 100%, 0 100%, 0 20%);
+      opacity: 0.9;
+    }
+
+    .steps-village {
+      position: absolute;
+      right: 3%;
+      bottom: 78px;
+      width: 150px;
+      height: 120px;
+      background:
+        linear-gradient(135deg, transparent 0 28%, #d7b947 29% 54%, transparent 55%),
+        linear-gradient(180deg, #c49d37, #886b26);
+      clip-path: polygon(0 42%, 50% 0, 100% 42%, 100% 100%, 0 100%);
+      opacity: 0.88;
+      box-shadow: 0 16px 24px rgba(0, 0, 0, 0.24);
+    }
+
+    .steps-tree {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 17px solid transparent;
+      border-right: 17px solid transparent;
+      border-bottom: 56px solid var(--tree-color, #236f38);
+      filter: drop-shadow(0 9px 0 rgba(0, 0, 0, 0.16));
+    }
+
+    .steps-tree::after {
+      content: "";
+      position: absolute;
+      left: -5px;
+      top: 50px;
+      width: 10px;
+      height: 24px;
+      background: #60411f;
+    }
+
+    .steps-tree.t1 { left: 4%; top: 110px; transform: scale(1.25); }
+    .steps-tree.t2 { left: 11%; top: 250px; transform: scale(0.95); }
+    .steps-tree.t3 { left: 20%; top: 170px; transform: scale(1.15); }
+    .steps-tree.t4 { left: 31%; top: 250px; transform: scale(0.95); }
+    .steps-tree.t5 { right: 8%; top: 126px; transform: scale(1.25); --tree-color: #5f852d; }
+    .steps-tree.t6 { right: 19%; top: 210px; transform: scale(0.95); --tree-color: #6d8c2f; }
+
+    .step-node {
+      position: absolute;
+      z-index: 4;
+      width: 58px;
+      height: 42px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 35%, #46505f, #1c2028 68%);
+      border: 5px solid #b99b6b;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.34), inset 0 0 0 3px rgba(255, 255, 255, 0.08);
+    }
+
+    .step-node.cleared {
+      background: radial-gradient(circle at 50% 35%, #4c93ff, #1a3d80 68%);
+    }
+
+    .step-node.locked {
+      opacity: 0.72;
+      filter: grayscale(0.3);
+    }
+
+    .step-node::before {
+      content: attr(data-stars);
+      position: absolute;
+      left: 50%;
+      top: -34px;
+      transform: translateX(-50%);
+      color: #ffd13f;
+      font-size: 1.55rem;
+      letter-spacing: -4px;
+      text-shadow: 0 3px 0 #271507;
+      white-space: nowrap;
+    }
+
+    .step-node.locked::before {
+      color: rgba(25, 25, 25, 0.66);
+      text-shadow: 0 2px 0 rgba(255, 220, 110, 0.16);
+    }
+
+    .step-node.focus {
+      box-shadow: 0 0 0 10px rgba(255, 214, 68, 0.26), 0 0 34px rgba(255, 214, 68, 0.72);
+    }
+
+    .step-1 { left: 8%; bottom: 152px; }
+    .step-2 { left: 17%; bottom: 270px; }
+    .step-3 { left: 33%; bottom: 326px; }
+    .step-4 { left: 49%; bottom: 220px; }
+    .step-5 { left: 62%; bottom: 126px; }
+    .step-6 { right: 18%; bottom: 186px; }
+    .step-7 { right: 7%; bottom: 102px; }
+
+    .stage-hero-card {
+      position: absolute;
+      z-index: 5;
+      width: 148px;
+      height: 128px;
+      border-radius: 14px;
+      background: rgba(35, 46, 36, 0.88);
+      border: 3px solid #9b875c;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.34);
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 8px;
+    }
+
+    .stage-hero-card.left {
+      left: 5%;
+      bottom: 176px;
+    }
+
+    .stage-hero-card.right {
+      right: 10%;
+      bottom: 142px;
+    }
+
+    .stage-hero-card .chapter-portrait {
+      width: 62px;
+      height: 62px;
+    }
+
+    .locked-stars {
+      color: rgba(15, 15, 15, 0.72);
+      font-size: 1.8rem;
+      letter-spacing: -4px;
+      text-shadow: 0 2px 0 rgba(255, 225, 128, 0.2);
+    }
+
+    .stage-boss-figure {
+      position: absolute;
+      z-index: 5;
+      left: 61%;
+      bottom: 160px;
+      width: 112px;
+      height: 160px;
+      filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.34));
+    }
+
+    .stage-boss-figure::before {
+      content: "";
+      position: absolute;
+      left: 24px;
+      top: 0;
+      width: 62px;
+      height: 62px;
+      border-radius: 50% 50% 42% 42%;
+      background: #ac3828;
+      box-shadow: inset -10px -6px rgba(0, 0, 0, 0.22);
+    }
+
+    .stage-boss-figure::after {
+      content: "";
+      position: absolute;
+      left: 10px;
+      bottom: 0;
+      width: 92px;
+      height: 118px;
+      background: linear-gradient(180deg, #d06a2d, #7d251b);
+      clip-path: polygon(50% 0, 82% 22%, 100% 72%, 76% 100%, 24% 100%, 0 72%, 18% 22%);
+      border: 4px solid rgba(255, 220, 125, 0.28);
+    }
+
+    .stage-coach {
+      position: absolute;
+      z-index: 7;
+      left: 42%;
+      top: 292px;
+      transform: translateX(-50%);
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 48% 36%, #efb381 0 24%, transparent 25%),
+        radial-gradient(circle at 50% 50%, #245fa0 0 68%, #0d3b66 69%);
+      border: 5px solid rgba(34, 124, 172, 0.86);
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .stage-coach::before {
+      content: "";
+      position: absolute;
+      left: 42px;
+      top: 24px;
+      width: 84px;
+      height: 48px;
+      border-radius: 50%;
+      background: #e06c22;
+      box-shadow: inset -12px -5px rgba(129, 38, 13, 0.2);
+    }
+
+    .stage-coach::after {
+      content: "";
+      position: absolute;
+      left: 45px;
+      bottom: 18px;
+      width: 82px;
+      height: 74px;
+      background: linear-gradient(180deg, #48a9e0, #94522f);
+      clip-path: polygon(50% 0, 88% 100%, 12% 100%);
+    }
+
+    .stage-tutorial-dialogue {
+      position: absolute;
+      z-index: 8;
+      left: 47%;
+      top: 320px;
+      width: min(520px, 46%);
+      border: 4px solid #cf7e3f;
+      border-radius: 13px;
+      background: #ffe4bd;
+      color: #6e5136;
+      padding: 22px 26px 22px 34px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.32);
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .stage-tutorial-dialogue::before {
+      content: "";
+      position: absolute;
+      left: -28px;
+      top: 42px;
+      border-right: 30px solid #ffe4bd;
+      border-top: 18px solid transparent;
+      border-bottom: 18px solid transparent;
+    }
+
+    .dialogue-name {
+      position: absolute;
+      left: 28px;
+      top: -30px;
+      min-width: 154px;
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #a84b20, #71310f);
+      border: 3px solid #e0a162;
+      color: #fff8d4;
+      font-size: 1.25rem;
+      font-weight: 950;
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.22);
+    }
+
+    .stage-tutorial-dialogue em {
+      color: #d64d1f;
+      font-style: normal;
+      font-weight: 950;
+    }
+
+    .next-label {
+      display: block;
+      text-align: right;
+      color: #d64d1f;
+      font-size: 1.24rem;
+      margin-top: 8px;
+    }
+
+    .steps-bottom {
+      position: absolute;
+      z-index: 8;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      min-height: 74px;
+      display: grid;
+      grid-template-columns: 140px 1fr 160px 170px 160px;
+      align-items: center;
+      gap: 14px;
+      padding: 0 22px;
+      background: linear-gradient(180deg, #59361c, #24150b);
+      border-top: 4px solid #96714a;
+      color: #ffd34f;
+      font-size: 1.15rem;
+      font-weight: 950;
+    }
+
+    .steps-bottom .progress-fill {
+      width: 44%;
+    }
+
+    .story-page {
+      min-height: 760px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(159, 231, 240, 0.7), rgba(119, 188, 152, 0.42) 44%, rgba(65, 45, 28, 0.82) 100%),
+        linear-gradient(135deg, #bcebf4, #7fb989 50%, #4c3927);
+      box-shadow: inset 0 0 0 2px rgba(255, 231, 164, 0.08);
+    }
+
+    .story-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 34%, rgba(0, 0, 0, 0.42)),
+        radial-gradient(circle at 18% 52%, rgba(234, 255, 95, 0.35), transparent 12rem),
+        radial-gradient(circle at 78% 56%, rgba(255, 221, 99, 0.36), transparent 10rem);
+      pointer-events: none;
+    }
+
+    .story-close {
+      position: absolute;
+      z-index: 6;
+      top: 30px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #74362a;
+      border: 4px solid #c69b5c;
+      color: #ffe199;
+      font-size: 2rem;
+      font-weight: 950;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.34);
+    }
+
+    .story-sky {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 42%;
+      background:
+        linear-gradient(155deg, transparent 0 46%, rgba(255, 255, 255, 0.7) 47% 54%, transparent 55%),
+        linear-gradient(180deg, #9ee4ef, #c9f0e5);
+      opacity: 0.72;
+    }
+
+    .story-tree {
+      position: absolute;
+      bottom: 210px;
+      width: 0;
+      height: 0;
+      border-left: 58px solid transparent;
+      border-right: 58px solid transparent;
+      border-bottom: 230px solid rgba(40, 112, 68, 0.72);
+      filter: drop-shadow(0 16px 0 rgba(0, 0, 0, 0.1));
+    }
+
+    .story-tree::after {
+      content: "";
+      position: absolute;
+      left: -9px;
+      top: 210px;
+      width: 18px;
+      height: 84px;
+      background: rgba(86, 58, 28, 0.7);
+    }
+
+    .story-tree:nth-child(2) { left: 3%; transform: scale(1.2); }
+    .story-tree:nth-child(3) { left: 18%; transform: scale(0.88); opacity: 0.72; }
+    .story-tree:nth-child(4) { left: 34%; transform: scale(1.05); opacity: 0.62; }
+    .story-tree:nth-child(5) { left: 61%; transform: scale(1.28); opacity: 0.7; }
+    .story-tree:nth-child(6) { left: 82%; transform: scale(1.15); }
+
+    .story-ground {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 42%;
+      background:
+        radial-gradient(circle at 18% 0, rgba(218, 238, 80, 0.6), transparent 16rem),
+        radial-gradient(circle at 78% 20%, rgba(238, 212, 81, 0.36), transparent 14rem),
+        linear-gradient(12deg, #6a5d30, #b0c768 42%, #7a6a3e 43%, #4c3a28 100%);
+      clip-path: polygon(0 24%, 26% 4%, 52% 18%, 76% 0, 100% 15%, 100% 100%, 0 100%);
+    }
+
+    .story-path {
+      position: absolute;
+      left: 12%;
+      right: 34%;
+      bottom: 0;
+      height: 38%;
+      background: linear-gradient(95deg, rgba(121, 87, 50, 0.74), rgba(201, 164, 92, 0.82), rgba(93, 67, 42, 0.72));
+      clip-path: polygon(28% 0, 66% 0, 90% 100%, 0 100%);
+      opacity: 0.86;
+    }
+
+    .story-props-left {
+      position: absolute;
+      left: 0;
+      bottom: 46%;
+      width: 180px;
+      height: 160px;
+    }
+
+    .crate {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 88px;
+      height: 54px;
+      background: linear-gradient(135deg, #d59d62, #704625);
+      border: 4px solid rgba(255, 230, 168, 0.28);
+    }
+
+    .barrel {
+      position: absolute;
+      left: 74px;
+      bottom: 44px;
+      width: 54px;
+      height: 74px;
+      border-radius: 24px;
+      background: linear-gradient(90deg, #8b4b24, #c47a35, #6b351c);
+      border: 3px solid rgba(255, 230, 168, 0.22);
+    }
+
+    .story-gold {
+      position: absolute;
+      right: 0;
+      bottom: 42%;
+      width: 210px;
+      height: 150px;
+      background:
+        radial-gradient(circle at 18% 70%, #fff07a 0 11px, #d48610 12px 24px, transparent 25px),
+        radial-gradient(circle at 38% 54%, #fff07a 0 11px, #d48610 12px 24px, transparent 25px),
+        radial-gradient(circle at 58% 66%, #fff07a 0 11px, #d48610 12px 24px, transparent 25px),
+        radial-gradient(circle at 76% 48%, #fff07a 0 11px, #d48610 12px 24px, transparent 25px);
+      filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.32));
+    }
+
+    .story-hero-small,
+    .story-archer-small {
+      position: absolute;
+      z-index: 3;
+      bottom: 252px;
+      width: 92px;
+      height: 150px;
+    }
+
+    .story-hero-small {
+      left: 63%;
+    }
+
+    .story-archer-small {
+      left: 36%;
+      transform: scale(0.78);
+    }
+
+    .story-hero-small::before,
+    .story-archer-small::before {
+      content: "";
+      position: absolute;
+      left: 28px;
+      top: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #efc18c;
+      box-shadow: inset -6px -3px rgba(0, 0, 0, 0.12);
+    }
+
+    .story-hero-small::after,
+    .story-archer-small::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 38px;
+      width: 58px;
+      height: 86px;
+      border-radius: 26px 26px 12px 12px;
+      background: linear-gradient(90deg, #2d4f8c, #d43a42 62%, #d9edf2);
+      box-shadow: inset -10px -10px rgba(0, 0, 0, 0.18);
+    }
+
+    .story-archer-small::after {
+      background: linear-gradient(90deg, #1a4e58, #d8ad3f 62%, #2d3e61);
+    }
+
+    .story-sword-small {
+      position: absolute;
+      left: 58%;
+      bottom: 346px;
+      width: 158px;
+      height: 14px;
+      background: #d9edf2;
+      transform: rotate(-22deg);
+      border-radius: 999px;
+      box-shadow: 0 0 0 3px #496276;
+      z-index: 2;
+    }
+
+    .story-arrow {
+      position: absolute;
+      z-index: 2;
+      left: 56%;
+      bottom: 270px;
+      width: 220px;
+      height: 5px;
+      background: #a12820;
+      transform: rotate(28deg);
+    }
+
+    .story-speaker {
+      position: absolute;
+      z-index: 5;
+      right: -4px;
+      bottom: 0;
+      width: 330px;
+      height: 430px;
+    }
+
+    .story-speaker::before {
+      content: "";
+      position: absolute;
+      right: 88px;
+      top: 22px;
+      width: 90px;
+      height: 92px;
+      border-radius: 50% 50% 44% 44%;
+      background: #efc18c;
+      box-shadow: inset -14px -6px rgba(0, 0, 0, 0.14);
+    }
+
+    .story-speaker::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      bottom: 0;
+      width: 240px;
+      height: 310px;
+      border-radius: 88px 88px 10px 10px;
+      background: linear-gradient(90deg, #253d75, #b82d3b 66%, #374e7a);
+      box-shadow: inset -30px -22px rgba(0, 0, 0, 0.24), 0 24px 28px rgba(0, 0, 0, 0.32);
+    }
+
+    .story-dialogue {
+      position: absolute;
+      z-index: 6;
+      right: 20%;
+      bottom: 134px;
+      width: min(520px, 48%);
+      min-height: 118px;
+      border-radius: 16px;
+      background: #fff8d4;
+      color: #7b664e;
+      display: flex;
+      align-items: center;
+      padding: 0 54px;
+      font-size: 1.28rem;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+    }
+
+    .story-dialogue::after {
+      content: "»";
+      position: absolute;
+      right: 22px;
+      bottom: 20px;
+      color: #9d8767;
+      font-size: 2rem;
+      font-weight: 950;
+    }
+
+    .team-level-page {
+      min-height: 760px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(180deg, rgba(28, 18, 18, 0.28), rgba(38, 24, 35, 0.74)),
+        radial-gradient(circle at 36% 48%, rgba(31, 118, 141, 0.28), transparent 9rem),
+        linear-gradient(135deg, #443026, #322126 52%, #1d171a);
+      box-shadow: inset 0 0 0 2px rgba(255, 231, 164, 0.06);
+    }
+
+    .team-level-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(7px);
+      background:
+        radial-gradient(circle at 50% 36%, rgba(255, 189, 74, 0.2), transparent 15rem),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.34));
+      pointer-events: none;
+    }
+
+    .level-modal {
+      width: min(650px, calc(100% - 36px));
+      position: relative;
+      z-index: 2;
+      display: grid;
+      justify-items: center;
+      text-align: center;
+      padding: 40px 22px 28px;
+    }
+
+    .level-burst {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 360px;
+      height: 360px;
+      background: radial-gradient(circle, rgba(255, 203, 83, 0.72) 0 12%, rgba(255, 160, 33, 0.28) 13% 34%, transparent 35%);
+      clip-path: polygon(50% 0, 58% 24%, 82% 8%, 76% 35%, 100% 38%, 78% 52%, 94% 75%, 66% 66%, 62% 100%, 48% 72%, 27% 96%, 32% 66%, 0 72%, 24% 50%, 2% 28%, 32% 34%);
+      opacity: 0.78;
+      filter: blur(0.2px);
+    }
+
+    .level-light {
+      position: absolute;
+      top: 178px;
+      left: 50%;
+      width: 760px;
+      height: 4px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, transparent, #ffc64e, #fff5a8, #ffc64e, transparent);
+      box-shadow: 0 0 24px rgba(255, 199, 78, 0.86);
+    }
+
+    .level-orb {
+      position: relative;
+      z-index: 2;
+      width: 118px;
+      height: 118px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 42% 32%, #59c6ef, #0b5d86 62%, #07354f);
+      border: 6px solid #b38a51;
+      box-shadow: 0 0 0 4px rgba(34, 20, 10, 0.72), inset 0 0 0 5px rgba(255, 255, 255, 0.1), 0 0 34px rgba(255, 191, 66, 0.58);
+      color: #fff;
+      font-size: 4.1rem;
+      font-weight: 950;
+      text-shadow: 0 4px 0 rgba(0, 0, 0, 0.42);
+    }
+
+    .level-title {
+      position: relative;
+      z-index: 2;
+      margin: 22px 0 22px;
+      color: #fff8e2;
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      font-weight: 500;
+      text-shadow: 0 4px 0 rgba(0, 0, 0, 0.32);
+    }
+
+    .level-stats {
+      position: relative;
+      z-index: 2;
+      width: min(460px, 100%);
+      display: grid;
+      gap: 8px;
+      margin-bottom: 26px;
+    }
+
+    .level-stat-row {
+      display: grid;
+      grid-template-columns: 1fr 52px 26px 52px;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 14px;
+      background: linear-gradient(90deg, rgba(99, 50, 24, 0.34), rgba(40, 26, 24, 0.28));
+      color: #f8dfac;
+      font-weight: 950;
+      text-align: left;
+    }
+
+    .level-stat-row b {
+      color: #fff;
+      text-align: right;
+      font-size: 1.15rem;
+    }
+
+    .level-stat-row i {
+      color: #d3a05f;
+      font-style: normal;
+      text-align: center;
+    }
+
+    .level-stat-row strong {
+      color: #80d45c;
+      text-align: right;
+      font-size: 1.15rem;
+    }
+
+    .energy-reward-label {
+      position: relative;
+      z-index: 2;
+      color: #fff8e2;
+      font-size: 1.25rem;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .energy-card {
+      position: relative;
+      z-index: 2;
+      width: 88px;
+      height: 88px;
+      border-radius: 7px;
+      border: 3px solid #b9943e;
+      background: linear-gradient(135deg, #151d50, #1a77b9 50%, #9d39da);
+      display: grid;
+      place-items: center;
+      color: #79fbff;
+      font-size: 3.1rem;
+      font-weight: 950;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.14), 0 12px 24px rgba(0, 0, 0, 0.36);
+    }
+
+    .energy-card b {
+      position: absolute;
+      right: 7px;
+      bottom: 3px;
+      color: #fff;
+      font-size: 1rem;
+      text-shadow: 0 2px 0 #000;
+    }
+
+    .energy-tooltip {
+      position: relative;
+      z-index: 3;
+      width: min(390px, 92%);
+      margin: -10px 0 18px 210px;
+      border: 3px solid #554018;
+      border-radius: 8px;
+      background: rgba(15, 9, 3, 0.92);
+      color: #f6e7bc;
+      padding: 16px 18px;
+      text-align: center;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.34);
+    }
+
+    .energy-tooltip strong {
+      display: block;
+      color: #fff134;
+      font-size: 1.35rem;
+      margin-bottom: 4px;
+    }
+
+    .level-confirm {
+      position: relative;
+      z-index: 2;
+      min-width: 210px;
+      min-height: 58px;
+      border-radius: 8px;
+      border: 3px solid #d9a45a;
+      background: linear-gradient(180deg, #8cfb30, #36a812);
+      color: #fff8c8;
+      display: grid;
+      place-items: center;
+      font-size: 1.55rem;
+      font-weight: 950;
+      text-decoration: none;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.24), 0 8px 0 #1c6611, 0 18px 36px rgba(0, 0, 0, 0.34);
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .team-skill-page {
+      min-height: 760px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 74% 43%, rgba(118, 235, 116, 0.32), transparent 16rem),
+        radial-gradient(circle at 58% 38%, rgba(223, 255, 217, 0.34), transparent 15rem),
+        linear-gradient(100deg, rgba(6, 75, 72, 0.96) 0 38%, rgba(13, 18, 22, 0.16) 38% 100%),
+        linear-gradient(135deg, #0e4b51, #436356 50%, #15191b);
+      box-shadow: inset 0 0 0 2px rgba(194, 255, 189, 0.07);
+    }
+
+    .team-skill-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(6, 72, 74, 0.9) 0 38%, transparent 38%),
+        radial-gradient(circle at 88% 72%, rgba(92, 255, 88, 0.22), transparent 14rem),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 136px);
+      pointer-events: none;
+    }
+
+    .skill-forest span {
+      position: absolute;
+      z-index: 1;
+      bottom: -30px;
+      width: 150px;
+      height: 680px;
+      background: linear-gradient(180deg, transparent, rgba(11, 31, 28, 0.74));
+      clip-path: polygon(46% 0, 56% 0, 54% 100%, 40% 100%);
+      opacity: 0.54;
+    }
+
+    .skill-forest span:nth-child(1) { left: 42%; transform: rotate(8deg); }
+    .skill-forest span:nth-child(2) { left: 58%; height: 720px; transform: rotate(-7deg); }
+    .skill-forest span:nth-child(3) { left: 76%; height: 650px; transform: rotate(12deg); }
+    .skill-forest span:nth-child(4) { left: 90%; height: 720px; transform: rotate(-9deg); }
+
+    .team-skill-panel {
+      width: min(520px, 49%);
+      min-height: 100%;
+      position: relative;
+      z-index: 4;
+      padding: 72px 42px 38px;
+      background: linear-gradient(100deg, rgba(7, 91, 91, 0.9), rgba(10, 83, 82, 0.76) 74%, transparent);
+    }
+
+    .team-skill-name {
+      width: 128%;
+      margin-left: -42px;
+      padding: 10px 42px 18px;
+      background: rgba(8, 94, 98, 0.72);
+      color: #fff;
+      font-size: clamp(3rem, 6.2vw, 5.4rem);
+      line-height: 1.05;
+      font-weight: 500;
+      letter-spacing: 0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .leaf-mark {
+      width: 74px;
+      height: 58px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .leaf-mark::before,
+    .leaf-mark::after,
+    .leaf-mark span {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      width: 28px;
+      height: 54px;
+      background: linear-gradient(180deg, #c7ff3e, #4ec62e);
+      border-radius: 100% 0 100% 0;
+      box-shadow: 0 0 18px rgba(136, 255, 67, 0.36);
+      transform-origin: bottom center;
+    }
+
+    .leaf-mark::before {
+      left: 8px;
+      transform: rotate(-22deg);
+    }
+
+    .leaf-mark span {
+      left: 23px;
+      transform: rotate(0);
+    }
+
+    .leaf-mark::after {
+      left: 38px;
+      transform: rotate(22deg);
+    }
+
+    .team-skill-tooltip {
+      position: absolute;
+      z-index: 7;
+      left: 276px;
+      bottom: 88px;
+      width: min(450px, 45%);
+      border: 3px solid #4a2e12;
+      border-radius: 8px;
+      background: rgba(18, 8, 2, 0.94);
+      color: #f8e6bb;
+      padding: 16px 18px;
+      font-size: 1.02rem;
+      line-height: 1.45;
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.36);
+    }
+
+    .team-skill-tooltip strong {
+      display: block;
+      color: #fff2cb;
+      font-size: 1.18rem;
+      margin-bottom: 3px;
+    }
+
+    .heal-amount {
+      color: #56ff60;
+      font-weight: 950;
+    }
+
+    .healer-art {
+      position: absolute;
+      z-index: 2;
+      right: 7%;
+      top: 9%;
+      width: min(590px, 52%);
+      height: 650px;
+      filter: drop-shadow(0 26px 34px rgba(0, 0, 0, 0.48));
+    }
+
+    .healer-aura {
+      position: absolute;
+      right: -40px;
+      bottom: 64px;
+      width: 520px;
+      height: 160px;
+      border: 12px solid rgba(100, 255, 82, 0.26);
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 50%;
+      transform: rotate(-18deg);
+      box-shadow: 0 0 28px rgba(97, 255, 90, 0.32);
+    }
+
+    .healer-hair {
+      position: absolute;
+      left: 176px;
+      top: 44px;
+      width: 190px;
+      height: 160px;
+      background: linear-gradient(135deg, #fff9d8, #e1dfcf 58%, #c5b89a);
+      clip-path: polygon(32% 0, 90% 14%, 100% 52%, 74% 100%, 28% 90%, 0 48%, 10% 12%);
+      border-radius: 50%;
+    }
+
+    .healer-face {
+      position: absolute;
+      left: 218px;
+      top: 116px;
+      width: 96px;
+      height: 108px;
+      border-radius: 50% 50% 46% 46%;
+      background: #dcae86;
+      box-shadow: inset -10px -10px rgba(123, 70, 56, 0.14);
+    }
+
+    .healer-body {
+      position: absolute;
+      left: 205px;
+      top: 214px;
+      width: 150px;
+      height: 270px;
+      background: linear-gradient(180deg, #fff6df, #f0ead2 48%, #e0d1a6);
+      clip-path: polygon(34% 0, 70% 0, 100% 100%, 0 100%);
+      border-left: 9px solid rgba(210, 160, 74, 0.9);
+      border-right: 9px solid rgba(210, 160, 74, 0.9);
+      transform: rotate(-5deg);
+    }
+
+    .healer-arm-left,
+    .healer-arm-right {
+      position: absolute;
+      height: 34px;
+      border-radius: 999px;
+      background: #dcae86;
+      box-shadow: inset -10px -4px rgba(0, 0, 0, 0.14);
+      transform-origin: left center;
+    }
+
+    .healer-arm-left {
+      left: 90px;
+      top: 250px;
+      width: 190px;
+      transform: rotate(-28deg);
+    }
+
+    .healer-arm-right {
+      left: 320px;
+      top: 244px;
+      width: 172px;
+      transform: rotate(-48deg);
+    }
+
+    .healer-staff {
+      position: absolute;
+      right: 20px;
+      top: 42px;
+      width: 26px;
+      height: 520px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #74542b, #e1bc66, #684318);
+      transform: rotate(8deg);
+      box-shadow: 0 0 0 3px rgba(255, 235, 149, 0.13);
+    }
+
+    .staff-orb {
+      position: absolute;
+      right: -46px;
+      top: -24px;
+      width: 154px;
+      height: 154px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 34%, #c4ff79, #19b42e 54%, #064f26);
+      border: 14px solid #d3b75b;
+      box-shadow: 0 0 28px rgba(79, 255, 74, 0.58);
+    }
+
+    .staff-orb::before,
+    .staff-orb::after {
+      content: "";
+      position: absolute;
+      inset: -44px;
+      border: 16px solid #d3b75b;
+      border-left-color: transparent;
+      border-bottom-color: transparent;
+      transform: rotate(42deg);
+      border-radius: 24px;
+    }
+
+    .team-skill-button {
+      position: absolute;
+      z-index: 8;
+      right: 18%;
+      bottom: 58px;
+      min-width: 236px;
+      height: 78px;
+      border-radius: 8px;
+      border: 3px solid #76d759;
+      background: linear-gradient(180deg, #72fb52, #25aa28);
+      color: #efffc9;
+      display: grid;
+      place-items: center;
+      font-size: 1.8rem;
+      font-weight: 950;
+      text-decoration: none;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.22), 0 8px 0 #15701b, 0 18px 36px rgba(0, 0, 0, 0.34);
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .quest-system-page {
+      min-height: 760px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 50% 34%, rgba(45, 76, 202, 0.28), transparent 18rem),
+        radial-gradient(circle at 18% 70%, rgba(25, 146, 214, 0.3), transparent 16rem),
+        linear-gradient(90deg, rgba(10, 35, 82, 0.9), rgba(32, 25, 88, 0.82) 56%, rgba(9, 12, 29, 0.95));
+      box-shadow: inset 0 0 0 2px rgba(88, 178, 255, 0.08);
+    }
+
+    .quest-system-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.48)),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.026) 0 2px, transparent 2px 136px);
+      pointer-events: none;
+    }
+
+    .quest-hall {
+      position: absolute;
+      inset: 0;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .quest-hall span {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 82px;
+      background: linear-gradient(180deg, #142657, #080b1d);
+      border-left: 4px solid rgba(199, 166, 84, 0.2);
+      border-right: 4px solid rgba(0, 0, 0, 0.28);
+    }
+
+    .quest-hall span:nth-child(1) { left: 5%; }
+    .quest-hall span:nth-child(2) { left: 28%; }
+    .quest-hall span:nth-child(3) { left: 53%; }
+    .quest-hall span:nth-child(4) { right: 7%; }
+
+    .quest-header {
+      position: relative;
+      z-index: 5;
+      padding-top: 34px;
+      text-align: center;
+      color: #e6dcbd;
+    }
+
+    .quest-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: clamp(2rem, 4.4vw, 3.5rem);
+      font-weight: 500;
+      text-shadow: 0 4px 0 rgba(0, 0, 0, 0.28);
+    }
+
+    .quest-info-dot {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #32a9c7, #115377);
+      color: #efd98b;
+      font-size: 1.35rem;
+      font-weight: 950;
+    }
+
+    .quest-subtitle {
+      margin-top: 8px;
+      color: #d3a95b;
+      font-size: 1.12rem;
+      font-weight: 900;
+    }
+
+    .quest-close {
+      position: absolute;
+      z-index: 7;
+      top: 30px;
+      right: 34px;
+      color: #ecd078;
+      font-size: 4rem;
+      line-height: 1;
+      font-weight: 300;
+    }
+
+    .quest-track {
+      position: absolute;
+      z-index: 4;
+      left: 46px;
+      right: 46px;
+      top: 170px;
+      bottom: 136px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .quest-card {
+      position: relative;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 18px;
+      padding: 28px 16px 52px;
+      text-align: center;
+      color: #dbb964;
+      border-left: 2px solid rgba(85, 139, 255, 0.22);
+      border-right: 2px solid rgba(0, 0, 0, 0.18);
+      background: linear-gradient(180deg, rgba(19, 49, 110, 0.28), rgba(14, 63, 123, 0.5));
+    }
+
+    .quest-card.active {
+      border-radius: 0 34px 34px 0;
+      background: linear-gradient(180deg, rgba(17, 79, 142, 0.72), rgba(0, 132, 231, 0.42));
+      box-shadow: inset 0 0 70px rgba(72, 195, 255, 0.22), 0 0 38px rgba(35, 156, 255, 0.14);
+    }
+
+    .quest-card.dim {
+      opacity: 0.54;
+      filter: grayscale(0.28);
+    }
+
+    .quest-num {
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      line-height: 1;
+      color: #d5ad4e;
+      font-weight: 950;
+      text-shadow: 0 4px 0 rgba(0, 0, 0, 0.32);
+    }
+
+    .quest-label {
+      margin-top: -12px;
+      color: #c99e44;
+      font-weight: 950;
+      font-size: 1.08rem;
+    }
+
+    .quest-task {
+      min-height: 72px;
+      display: grid;
+      place-items: center;
+      color: #ffe0a0;
+      font-size: 1.12rem;
+      font-weight: 950;
+      line-height: 1.35;
+    }
+
+    .quest-reward-icon {
+      width: 74px;
+      height: 74px;
+      border-radius: 8px;
+      border: 4px solid #a77b2f;
+      background:
+        radial-gradient(circle at 50% 44%, var(--reward-glow, #ffe748) 0 17px, transparent 18px),
+        linear-gradient(135deg, var(--reward-a, #824b13), var(--reward-b, #f6c339));
+      display: grid;
+      place-items: center;
+      color: #fff4a0;
+      font-weight: 950;
+      box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.32), 0 10px 18px rgba(0, 0, 0, 0.28);
+      position: relative;
+    }
+
+    .quest-reward-icon b {
+      position: absolute;
+      right: 5px;
+      bottom: 2px;
+      color: #fff7a8;
+      font-size: 0.96rem;
+      text-shadow: 0 2px 0 #000;
+    }
+
+    .quest-claim {
+      min-width: 140px;
+      min-height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      border: 3px solid #5cca40;
+      background: linear-gradient(180deg, #69f64c, #249425);
+      color: #f3ffd2;
+      font-size: 1.15rem;
+      font-weight: 950;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.18), 0 6px 0 #125b17;
+    }
+
+    .quest-claim.done {
+      background: linear-gradient(180deg, #4b8ed2, #17466d);
+      border-color: #377cb7;
+      color: rgba(222, 248, 255, 0.72);
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.12), 0 6px 0 rgba(0, 0, 0, 0.22);
+    }
+
+    .quest-card-step {
+      position: absolute;
+      left: 50%;
+      bottom: -37px;
+      transform: translateX(-50%) rotate(45deg);
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 4px solid #795f2c;
+      background: #11417a;
+      color: #d6ad4c;
+      font-weight: 950;
+      box-shadow: 0 0 0 3px rgba(22, 11, 3, 0.34);
+    }
+
+    .quest-card-step span {
+      transform: rotate(-45deg);
+      display: block;
+    }
+
+    .quest-card.active::after {
+      content: "";
+      position: absolute;
+      right: -20px;
+      bottom: 32px;
+      width: 86px;
+      height: 60px;
+      background: #fffbe9;
+      clip-path: polygon(0 28%, 60% 28%, 60% 0, 100% 50%, 60% 100%, 60% 72%, 0 72%);
+      filter: drop-shadow(0 0 18px rgba(255, 245, 163, 0.86));
+    }
+
+    .quest-guide {
+      position: absolute;
+      z-index: 7;
+      left: 34%;
+      top: 376px;
+      width: 162px;
+      height: 162px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 34%, #efb381 0 25%, transparent 26%),
+        radial-gradient(circle at 50% 50%, #2b62a0 0 69%, #0d3b66 70%);
+      border: 5px solid rgba(32, 112, 172, 0.86);
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .quest-guide::before {
+      content: "";
+      position: absolute;
+      left: 40px;
+      top: 24px;
+      width: 84px;
+      height: 50px;
+      border-radius: 50%;
+      background: #1b2440;
+      box-shadow: inset -12px -4px rgba(0, 0, 0, 0.22);
+    }
+
+    .quest-guide::after {
+      content: "";
+      position: absolute;
+      left: 42px;
+      bottom: 18px;
+      width: 80px;
+      height: 70px;
+      background: linear-gradient(180deg, #d8ecff, #b5303e);
+      clip-path: polygon(50% 0, 88% 100%, 12% 100%);
+    }
+
+    .quest-dialogue {
+      position: absolute;
+      z-index: 8;
+      left: 46%;
+      top: 410px;
+      width: min(520px, 42%);
+      min-height: 124px;
+      border: 4px solid #cf7e3f;
+      border-radius: 12px;
+      background: #ffe3b8;
+      color: #6e5136;
+      padding: 26px 28px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.32);
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .quest-dialogue::before {
+      content: "";
+      position: absolute;
+      left: -28px;
+      top: 42px;
+      border-right: 30px solid #ffe3b8;
+      border-top: 18px solid transparent;
+      border-bottom: 18px solid transparent;
+    }
+
+    .quest-dialogue-name {
+      position: absolute;
+      left: 28px;
+      top: -30px;
+      min-width: 154px;
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #a84b20, #71310f);
+      border: 3px solid #e0a162;
+      color: #fff8d4;
+      font-size: 1.25rem;
+      font-weight: 950;
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.22);
+    }
+
+    .quest-bottom {
+      position: absolute;
+      z-index: 6;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      min-height: 106px;
+      display: grid;
+      grid-template-columns: 1fr 190px 86px;
+      align-items: center;
+      gap: 20px;
+      padding: 0 110px 0 320px;
+      background: linear-gradient(180deg, rgba(9, 18, 57, 0.92), rgba(5, 8, 28, 0.96));
+      border-top: 2px solid rgba(206, 157, 65, 0.38);
+      color: #d8c27b;
+      font-weight: 900;
+    }
+
+    .quest-main-goal {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 1.05rem;
+      line-height: 1.35;
+    }
+
+    .quest-scroll-icon {
+      width: 54px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      color: #e5c779;
+      font-size: 2.2rem;
+    }
+
+    .quest-progress-number {
+      color: #e8d6a8;
+      font-size: 1.92rem;
+      font-weight: 950;
+      text-align: right;
+    }
+
+    .quest-main-reward {
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      border: 4px solid #5a6f8f;
+      background:
+        radial-gradient(circle at 50% 35%, #d5b887 0 16px, transparent 17px),
+        linear-gradient(135deg, #18213d, #75502b);
+      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.12);
+    }
+
+    .dashboard-page {
+      min-height: 760px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(143, 109, 126, 0.42), rgba(71, 45, 48, 0.48)),
+        linear-gradient(135deg, #b98f92, #d1b98d 45%, #6f617a 100%);
+      box-shadow: inset 0 0 0 2px rgba(255, 231, 164, 0.08);
+    }
+
+    .dashboard-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 54% 45%, rgba(255, 232, 187, 0.72), transparent 17rem),
+        radial-gradient(circle at 87% 34%, rgba(77, 107, 150, 0.46), transparent 15rem),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.28));
+      pointer-events: none;
+    }
+
+    .dash-top {
+      position: absolute;
+      z-index: 8;
+      top: 22px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: #fff8df;
+      font-weight: 950;
+      font-size: 1.05rem;
+    }
+
+    .resource-pill {
+      min-width: 150px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 8px 0 16px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #5c3719, #2b180d);
+      border: 3px solid #9b7b4d;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.26);
+    }
+
+    .resource-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 1.25rem;
+      background: radial-gradient(circle at 36% 30%, #fff27d, #d58a12);
+    }
+
+    .resource-icon.gem {
+      background: linear-gradient(135deg, #b7ff8f, #1fbf4f 55%, #0b6b3f);
+      clip-path: polygon(50% 0, 100% 34%, 75% 100%, 25% 100%, 0 34%);
+      border-radius: 0;
+    }
+
+    .resource-icon.energy {
+      background: linear-gradient(135deg, #6feeff, #2163b8 58%, #7c43d9);
+    }
+
+    .plus {
+      width: 31px;
+      height: 31px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #80e84c, #338a1d);
+      border: 3px solid #3f752b;
+      color: #dfffbc;
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    .dash-left {
+      position: absolute;
+      z-index: 7;
+      top: 42px;
+      left: 24px;
+      width: 310px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .profile-medal {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      border: 7px solid #987348;
+      background: radial-gradient(circle at 50% 35%, #344c21, #0e1510 70%);
+      display: grid;
+      place-items: center;
+      color: #ef3730;
+      font-size: 3.2rem;
+      font-weight: 950;
+      box-shadow: inset 0 0 0 4px rgba(255, 230, 160, 0.16), 0 12px 20px rgba(0, 0, 0, 0.32);
+    }
+
+    .team-plate,
+    .vip-plate {
+      width: 160px;
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      color: #fff8df;
+      font-weight: 950;
+      background: linear-gradient(180deg, #5c3719, #211109);
+      border: 3px solid #a68150;
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.24);
+    }
+
+    .vip-plate {
+      color: #ffe339;
+      background: linear-gradient(180deg, #ad8b06, #5d3f05);
+    }
+
+    .task-banner {
+      position: absolute;
+      z-index: 7;
+      top: 50px;
+      left: 270px;
+      width: 440px;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 22px;
+      background: rgba(23, 111, 116, 0.75);
+      color: #e2e5c8;
+      font-size: 1.18rem;
+      font-weight: 950;
+      border-radius: 8px;
+    }
+
+    .task-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #275970, #d9a651);
+      border: 4px solid #b69356;
+      color: #fff;
+      font-size: 1.4rem;
+    }
+
+    .quest-stack {
+      margin-top: 4px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .quest-button {
+      width: 250px;
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      align-items: center;
+      background: linear-gradient(180deg, #5c3719, #25130a);
+      border: 3px solid #8c6d45;
+      border-radius: 7px;
+      color: #e9cf9b;
+      font-size: 1.15rem;
+      font-weight: 900;
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    .quest-button::after {
+      content: "";
+      position: absolute;
+      right: -8px;
+      top: -8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #c51d24;
+      border: 3px solid #8d0b10;
+    }
+
+    .quest-icon {
+      width: 46px;
+      height: 46px;
+      margin-left: 8px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #e9f0e1, #cc4c3a);
+      display: grid;
+      place-items: center;
+      color: #7d2d1b;
+      font-weight: 950;
+    }
+
+    .city-layer {
+      position: absolute;
+      inset: 118px 0 82px;
+      z-index: 1;
+    }
+
+    .sun-dome {
+      position: absolute;
+      left: 34%;
+      top: 28px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: rgba(255, 229, 209, 0.58);
+      box-shadow: 0 0 80px rgba(255, 226, 184, 0.48);
+    }
+
+    .building {
+      position: absolute;
+      z-index: 2;
+      bottom: 82px;
+      border-radius: 10px 10px 0 0;
+      background: linear-gradient(180deg, #f3e8c9, #b49362);
+      border: 4px solid rgba(110, 68, 34, 0.42);
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.24);
+    }
+
+    .merchant-house {
+      left: 6%;
+      width: 230px;
+      height: 172px;
+      background: linear-gradient(180deg, #6ac3b5 0 30%, #8d4b2d 31% 100%);
+    }
+
+    .portal-building {
+      left: 30%;
+      width: 210px;
+      height: 220px;
+      background: linear-gradient(180deg, #e7e0c0, #8577a2);
+    }
+
+    .portal-core {
+      position: absolute;
+      left: 50%;
+      top: 54px;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 126px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #19d7ff, #123d8d 58%, #05121e);
+      border: 8px solid #b59d7c;
+      box-shadow: 0 0 28px rgba(20, 205, 255, 0.58);
+    }
+
+    .atrium {
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 310px;
+      background: linear-gradient(180deg, #f6f1d9, #d8c18c);
+    }
+
+    .atrium::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -62px;
+      width: 72px;
+      height: 180px;
+      transform: translateX(-50%) rotate(35deg);
+      background: linear-gradient(180deg, #4cc0bd, #dbe6d9);
+      border-radius: 999px;
+    }
+
+    .obelisk {
+      right: 10%;
+      width: 190px;
+      height: 370px;
+      background: linear-gradient(135deg, #252033, #3d5267 52%, #111622);
+      clip-path: polygon(50% 0, 100% 28%, 88% 100%, 12% 100%, 0 28%);
+    }
+
+    .summon-label,
+    .building-label {
+      position: absolute;
+      z-index: 6;
+      min-width: 150px;
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: linear-gradient(180deg, #6a401a, #241308);
+      border: 3px solid #c49a5b;
+      color: #f7e3b1;
+      font-size: 1.1rem;
+      font-weight: 950;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.22);
+    }
+
+    .summon-label {
+      left: 50%;
+      top: 160px;
+      transform: translateX(-50%);
+    }
+
+    .label-merchant { left: 10%; bottom: 206px; }
+    .label-campaign { left: 33%; bottom: 180px; }
+
+    .mystery-chest {
+      position: absolute;
+      z-index: 6;
+      right: 3%;
+      bottom: 190px;
+      width: 190px;
+      min-height: 70px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: linear-gradient(180deg, #bb44e8, #4e1670);
+      border: 4px solid #e6b75f;
+      color: #f7d8ff;
+      font-weight: 950;
+      box-shadow: 0 0 24px rgba(216, 82, 255, 0.46);
+    }
+
+    .dash-dialogue {
+      position: absolute;
+      z-index: 9;
+      right: 4%;
+      bottom: 118px;
+      width: min(620px, 56%);
+      min-height: 154px;
+      border-radius: 16px;
+      border: 4px solid #e7cc86;
+      background: rgba(44, 23, 10, 0.94);
+      box-shadow: 0 0 24px rgba(255, 227, 139, 0.24);
+      padding: 26px 152px 24px 26px;
+    }
+
+    .dash-speech {
+      min-height: 76px;
+      border-radius: 15px 15px 15px 4px;
+      background: #fff8d4;
+      color: #6d5134;
+      display: flex;
+      align-items: center;
+      padding: 0 22px;
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .dash-speech em {
+      color: #d6573b;
+      font-style: normal;
+      font-weight: 950;
+    }
+
+    .dash-guide {
+      position: absolute;
+      right: -10px;
+      bottom: -5px;
+      width: 142px;
+      height: 174px;
+    }
+
+    .dash-guide::before {
+      content: "";
+      position: absolute;
+      left: 46px;
+      top: 16px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #e8b681;
+    }
+
+    .dash-guide::after {
+      content: "";
+      position: absolute;
+      left: 20px;
+      bottom: 0;
+      width: 108px;
+      height: 124px;
+      border-radius: 42px 42px 12px 12px;
+      background: linear-gradient(90deg, #273e70, #b82d3b 68%, #394e78);
+      box-shadow: inset -18px -12px rgba(0, 0, 0, 0.22);
+    }
+
+    .bottom-nav {
+      position: absolute;
+      z-index: 8;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      min-height: 92px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr) 86px;
+      gap: 6px;
+      align-items: end;
+      padding: 8px 18px 10px;
+      background: linear-gradient(180deg, rgba(85, 52, 27, 0.72), #2a170d);
+      border-top: 4px solid #96714a;
+    }
+
+    .nav-item {
+      min-width: 0;
+      display: grid;
+      justify-items: center;
+      gap: 5px;
+      color: #f5e2b4;
+      font-weight: 950;
+      font-size: 0.86rem;
+    }
+
+    .nav-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 4px solid #9d7d4f;
+      background: radial-gradient(circle at 38% 30%, #62d878, #254b28 70%);
+      color: #fff8d4;
+      font-size: 1.4rem;
+      box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.26);
+    }
+
+    .nav-item:nth-child(1) .nav-icon { background: radial-gradient(circle, #c13d34, #5b2117); }
+    .nav-item:nth-child(3) .nav-icon { background: radial-gradient(circle, #d1a547, #6c4318); }
+    .nav-item:nth-child(4) .nav-icon { background: radial-gradient(circle, #a7e085, #31531e); }
+    .nav-item:nth-child(5) .nav-icon { background: radial-gradient(circle, #5199e2, #142f64); }
+    .nav-item:nth-child(6) .nav-icon { background: radial-gradient(circle, #e0a82f, #622d5c); }
+    .nav-item:nth-child(7) .nav-icon { background: radial-gradient(circle, #6bb6dc, #1f4a68); }
+
+    .settings-stack {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      align-self: center;
+    }
+
+    .setting-button {
+      width: 38px;
+      height: 38px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #73dd42, #2d8b1c);
+      border: 3px solid #276b22;
+      color: #dffff0;
+      font-weight: 950;
+    }
+
+    section {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .section-lead {
+      max-width: 760px;
+      color: var(--muted);
+      margin: 0 0 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(32, 39, 46, 0.88), rgba(23, 29, 34, 0.88));
+      padding: 18px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+    }
+
+    .card p,
+    .card ul,
+    .card ol {
+      margin: 0;
+      color: #e4cf9f;
+    }
+
+    .card ul,
+    .card ol {
+      padding-left: 20px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tag {
+      border: 1px solid var(--line-soft);
+      color: var(--ink);
+      background: rgba(232, 174, 74, 0.1);
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .tag.play-link {
+      text-decoration: none;
+      background: linear-gradient(180deg, rgba(123, 217, 73, 0.24), rgba(54, 119, 42, 0.26));
+      border-color: rgba(123, 217, 73, 0.58);
+    }
+
+    .doc-note {
+      border: 1px solid rgba(232, 174, 74, 0.34);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(232, 174, 74, 0.12), rgba(32, 39, 46, 0.72));
+      padding: 18px;
+      color: #f3ddad;
+      margin-bottom: 22px;
+    }
+
+    .doc-meta {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 20px 0 0;
+    }
+
+    .meta-card {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: rgba(13, 18, 22, 0.62);
+      padding: 14px;
+    }
+
+    .meta-card small {
+      display: block;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .meta-card strong {
+      display: block;
+      color: var(--ink);
+      font-size: 1.05rem;
+      line-height: 1.35;
+    }
+
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .toc a {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: rgba(232, 174, 74, 0.08);
+      text-decoration: none;
+      font-weight: 850;
+      text-align: center;
+      padding: 8px 10px;
+    }
+
+    .design-callout {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .loop-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .loop-step {
+      min-height: 128px;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: rgba(23, 29, 34, 0.78);
+      padding: 14px;
+      position: relative;
+    }
+
+    .loop-step::after {
+      content: "›";
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent);
+      font-size: 2rem;
+      font-weight: 900;
+      z-index: 2;
+    }
+
+    .loop-step:last-child::after {
+      display: none;
+    }
+
+    .loop-step b {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .loop-step span {
+      display: block;
+      color: #e4cf9f;
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .spec-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .spec-list li {
+      border-left: 3px solid var(--accent);
+      background: rgba(232, 174, 74, 0.07);
+      color: #e4cf9f;
+      padding: 10px 12px;
+    }
+
+    .data-schema {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .schema-card {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: #0d1216;
+      overflow: hidden;
+    }
+
+    .schema-card h3 {
+      padding: 14px 16px;
+      background: rgba(232, 174, 74, 0.1);
+      border-bottom: 1px solid var(--line-soft);
+      margin: 0;
+    }
+
+    .schema-card code {
+      display: block;
+      white-space: pre-wrap;
+      color: #d8e8c3;
+      padding: 14px 16px 18px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+
+    .reference-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      font-weight: 950;
+      margin-bottom: 14px;
+    }
+
+    .architecture-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: #0d1216;
+      box-shadow: inset 0 0 0 1px rgba(248, 230, 187, 0.05);
+      padding: 12px;
+    }
+
+    svg {
+      display: block;
+      min-width: 980px;
+      width: 100%;
+      height: auto;
+    }
+
+    .svg-title {
+      font: 800 24px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      fill: #f8e6bb;
+    }
+
+    .svg-label {
+      font: 800 16px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      fill: #f8e6bb;
+    }
+
+    .svg-small {
+      font: 600 12px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      fill: #c4ad82;
+    }
+
+    .svg-box {
+      fill: #171d22;
+      stroke: #a97835;
+      stroke-width: 2;
+      rx: 8;
+    }
+
+    .svg-core {
+      fill: #222b31;
+      stroke: #e8ae4a;
+      stroke-width: 3;
+      rx: 8;
+    }
+
+    .svg-line {
+      fill: none;
+      stroke: #d19542;
+      stroke-width: 2.2;
+      marker-end: url(#arrow);
+    }
+
+    .svg-soft-line {
+      fill: none;
+      stroke: rgba(196, 173, 130, 0.65);
+      stroke-width: 1.8;
+      marker-end: url(#arrowSoft);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: var(--radius);
+      border: 1px solid var(--line-soft);
+      background: rgba(23, 29, 34, 0.7);
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line-soft);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--accent);
+      background: rgba(232, 174, 74, 0.09);
+      font-weight: 900;
+    }
+
+    td {
+      color: #e4cf9f;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .roadmap {
+      counter-reset: step;
+      display: grid;
+      gap: 12px;
+    }
+
+    .roadmap .card {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .roadmap .card::before {
+      counter-increment: step;
+      content: counter(step);
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #11171c;
+      font-weight: 900;
+      box-shadow: 0 0 0 4px rgba(232, 174, 74, 0.16);
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .check {
+      border-left: 3px solid var(--accent);
+      padding: 10px 12px;
+      background: rgba(232, 174, 74, 0.07);
+      color: #e4cf9f;
+    }
+
+    footer {
+      color: var(--muted);
+      padding: 34px 0 0;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .topline {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 28px;
+      }
+
+      .online {
+        font-size: 0.78rem;
+      }
+
+      .hero-grid,
+      .grid,
+      .grid.two,
+      .checklist,
+      .doc-meta,
+      .toc,
+      .design-callout,
+      .loop-flow,
+      .data-schema {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        min-height: auto;
+        padding: 32px 0 42px;
+      }
+
+      .reward-board {
+        grid-template-columns: 1fr;
+      }
+
+      .loop-step::after {
+        right: 50%;
+        top: auto;
+        bottom: -22px;
+        transform: translateX(50%) rotate(90deg);
+      }
+
+      .action-stage {
+        min-height: auto;
+      }
+
+      .pixel-game-shell {
+        margin: 0;
+      }
+
+      .pixel-stage {
+        height: 320px;
+      }
+
+      .pixel-hud {
+        top: 50px;
+        grid-template-columns: 1fr;
+      }
+
+      .pixel-hud .hud-panel:nth-child(2) {
+        display: none;
+      }
+
+      .pixel-quest-mini {
+        display: none;
+      }
+
+      .pixel-hero {
+        left: 74px;
+      }
+
+      .pixel-ally {
+        left: 28px;
+      }
+
+      .pixel-enemy {
+        right: 118px;
+      }
+
+      .pixel-boss {
+        right: 22px;
+        transform: scale(0.86);
+        transform-origin: bottom right;
+      }
+
+      .pixel-bottom-ui {
+        grid-template-columns: 1fr;
+      }
+
+      .pixel-party,
+      .pixel-skills {
+        justify-content: center;
+      }
+
+      .pixel-party-card {
+        width: 58px;
+      }
+
+      .pixel-skill {
+        width: 52px;
+        height: 52px;
+      }
+
+      .reward-page {
+        min-height: 940px;
+      }
+
+      .reward-nav {
+        height: 62px;
+        padding: 0 14px;
+      }
+
+      .reward-menu {
+        gap: 10px;
+      }
+
+      .reward-modal {
+        padding-top: 92px;
+      }
+
+      .victory-ribbon {
+        min-height: 78px;
+      }
+
+      .victory-ribbon::before,
+      .victory-ribbon::after {
+        display: none;
+      }
+
+      .star {
+        width: 42px;
+        height: 42px;
+      }
+
+      .reward-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .reward-stat {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 198, 95, 0.18);
+      }
+
+      .reward-stat:last-child {
+        border-bottom: 0;
+      }
+
+      .team-leveling-system {
+        min-height: 980px;
+      }
+
+      .team-victory-modal {
+        padding-top: 72px;
+      }
+
+      .team-victory-ribbon {
+        min-height: 78px;
+      }
+
+      .team-victory-ribbon::before,
+      .team-victory-ribbon::after {
+        display: none;
+      }
+
+      .team-level-summary {
+        grid-template-columns: 1fr;
+        padding: 8px 0 14px;
+      }
+
+      .team-level-stat {
+        min-height: 56px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 200, 109, 0.16);
+      }
+
+      .info-button {
+        width: min(220px, calc(100% - 32px));
+        margin-top: 10px;
+      }
+
+      .team-exp-row {
+        gap: 12px;
+      }
+
+      .team-exp-card {
+        width: 92px;
+      }
+
+      .member-card {
+        width: 86px;
+        height: 86px;
+      }
+
+      .member-hair {
+        left: 16px;
+        width: 54px;
+      }
+
+      .member-body {
+        left: 22px;
+        top: 52px;
+        width: 42px;
+        height: 34px;
+      }
+
+      .member-exp {
+        width: 82px;
+      }
+
+      .team-loot-row .loot-item {
+        width: 68px;
+        height: 68px;
+      }
+
+      .hero-detail-page {
+        min-height: 960px;
+      }
+
+      .hero-info-panel {
+        width: 100%;
+        padding: 48px 24px 320px;
+        background: linear-gradient(180deg, rgba(9, 82, 87, 0.92), rgba(14, 80, 84, 0.74) 62%, transparent);
+      }
+
+      .hero-name-strip {
+        width: calc(100% + 48px);
+        margin-left: -24px;
+        padding-left: 24px;
+      }
+
+      .hero-art {
+        width: 330px;
+        height: 380px;
+        right: 18px;
+        top: 570px;
+        transform: scale(0.72);
+        transform-origin: top right;
+      }
+
+      .deploy-button {
+        right: 88px;
+        bottom: 34px;
+        min-width: 170px;
+        height: 54px;
+        font-size: 1.1rem;
+      }
+
+      .swap-button {
+        right: 20px;
+        bottom: 28px;
+        width: 58px;
+        height: 58px;
+        font-size: 1.7rem;
+      }
+
+      .hero-story-link {
+        margin-top: 36px;
+      }
+
+      .team-skill-page {
+        min-height: 990px;
+      }
+
+      .team-skill-panel {
+        width: 100%;
+        padding: 48px 24px 430px;
+        background: linear-gradient(180deg, rgba(7, 91, 91, 0.94), rgba(10, 83, 82, 0.76) 62%, transparent);
+      }
+
+      .team-skill-name {
+        width: calc(100% + 48px);
+        margin-left: -24px;
+        padding-left: 24px;
+      }
+
+      .leaf-mark {
+        width: 58px;
+        height: 46px;
+      }
+
+      .leaf-mark::before,
+      .leaf-mark::after,
+      .leaf-mark span {
+        width: 22px;
+        height: 43px;
+      }
+
+      .leaf-mark span {
+        left: 18px;
+      }
+
+      .leaf-mark::after {
+        left: 29px;
+      }
+
+      .healer-art {
+        width: 360px;
+        height: 430px;
+        right: -14px;
+        top: 520px;
+        transform: scale(0.72);
+        transform-origin: top right;
+      }
+
+      .team-skill-tooltip {
+        left: 20px;
+        right: 20px;
+        bottom: 104px;
+        width: auto;
+        font-size: 0.9rem;
+      }
+
+      .team-skill-button {
+        right: 92px;
+        bottom: 28px;
+        min-width: 170px;
+        height: 54px;
+        font-size: 1.12rem;
+      }
+
+      .quest-system-page {
+        min-height: 1180px;
+      }
+
+      .quest-header {
+        padding: 44px 44px 0 18px;
+      }
+
+      .quest-title {
+        font-size: 2rem;
+      }
+
+      .quest-subtitle {
+        font-size: 0.88rem;
+      }
+
+      .quest-close {
+        top: 18px;
+        right: 16px;
+        font-size: 3rem;
+      }
+
+      .quest-track {
+        left: 14px;
+        right: 14px;
+        top: 142px;
+        bottom: 246px;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .quest-card {
+        min-height: 126px;
+        grid-template-columns: 58px 1fr 64px 86px;
+        align-content: center;
+        align-items: center;
+        justify-items: center;
+        gap: 8px;
+        padding: 12px 10px;
+      }
+
+      .quest-card.active {
+        border-radius: 18px;
+      }
+
+      .quest-num {
+        font-size: 1.72rem;
+      }
+
+      .quest-label {
+        font-size: 0.72rem;
+        margin-top: -8px;
+      }
+
+      .quest-task {
+        min-height: auto;
+        font-size: 0.82rem;
+      }
+
+      .quest-reward-icon {
+        width: 54px;
+        height: 54px;
+        border-width: 3px;
+      }
+
+      .quest-claim {
+        min-width: 74px;
+        min-height: 38px;
+        font-size: 0.82rem;
+      }
+
+      .quest-card-step,
+      .quest-card.active::after {
+        display: none;
+      }
+
+      .quest-guide {
+        left: 18px;
+        top: auto;
+        bottom: 130px;
+        width: 96px;
+        height: 96px;
+      }
+
+      .quest-guide::before {
+        left: 24px;
+        top: 15px;
+        width: 50px;
+        height: 30px;
+      }
+
+      .quest-guide::after {
+        left: 25px;
+        bottom: 10px;
+        width: 48px;
+        height: 44px;
+      }
+
+      .quest-dialogue {
+        left: 116px;
+        right: 14px;
+        top: auto;
+        bottom: 132px;
+        width: auto;
+        min-height: 104px;
+        padding: 22px 16px 14px;
+        font-size: 0.82rem;
+      }
+
+      .quest-dialogue::before {
+        display: none;
+      }
+
+      .quest-dialogue-name {
+        left: 14px;
+        top: -26px;
+        min-width: 112px;
+        min-height: 36px;
+        font-size: 0.9rem;
+      }
+
+      .quest-bottom {
+        min-height: 116px;
+        grid-template-columns: 1fr 84px 56px;
+        gap: 8px;
+        padding: 10px 12px;
+      }
+
+      .quest-main-goal {
+        gap: 8px;
+        font-size: 0.78rem;
+      }
+
+      .quest-scroll-icon {
+        width: 34px;
+        font-size: 1.5rem;
+      }
+
+      .quest-progress-number {
+        font-size: 1.3rem;
+      }
+
+      .quest-main-reward {
+        width: 52px;
+        height: 52px;
+      }
+
+      .stage-page {
+        min-height: 980px;
+      }
+
+      .stage-top-bar {
+        top: 18px;
+        width: calc(100% - 90px);
+        min-height: 54px;
+      }
+
+      .stage-top-bar::before,
+      .stage-top-bar::after {
+        display: none;
+      }
+
+      .stage-close {
+        top: 18px;
+        right: 14px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .map-region {
+        inset: 92px 0 92px;
+      }
+
+      .dialogue-box {
+        left: 16px;
+        right: 16px;
+        bottom: 150px;
+        width: auto;
+        padding: 18px 18px 120px;
+      }
+
+      .guide-character {
+        right: 10px;
+        transform: scale(0.76);
+        transform-origin: bottom right;
+      }
+
+      .chapter-card {
+        left: 22px;
+        bottom: 360px;
+      }
+
+      .stage-bottom {
+        height: 92px;
+        grid-template-columns: 1fr 1.3fr;
+        gap: 10px;
+        font-size: 0.98rem;
+      }
+
+      .stage-bottom span:nth-of-type(n+3) {
+        display: none;
+      }
+
+      .stage-steps-page {
+        min-height: 1020px;
+      }
+
+      .steps-map {
+        inset: 92px 0 92px;
+      }
+
+      .steps-path {
+        left: -4%;
+        right: -6%;
+        top: 330px;
+        height: 310px;
+        border-width: 13px;
+      }
+
+      .stage-coach {
+        left: 30%;
+        top: 315px;
+        width: 118px;
+        height: 118px;
+      }
+
+      .stage-coach::before {
+        left: 30px;
+        top: 18px;
+        width: 58px;
+        height: 34px;
+      }
+
+      .stage-coach::after {
+        left: 31px;
+        bottom: 13px;
+        width: 58px;
+        height: 52px;
+      }
+
+      .stage-tutorial-dialogue {
+        left: 18px;
+        right: 18px;
+        top: 470px;
+        width: auto;
+        padding: 24px 20px 18px;
+        font-size: 0.92rem;
+      }
+
+      .stage-tutorial-dialogue::before {
+        display: none;
+      }
+
+      .dialogue-name {
+        left: 18px;
+        min-width: 126px;
+        font-size: 1rem;
+      }
+
+      .stage-boss-figure {
+        left: 52%;
+        bottom: 260px;
+        transform: scale(0.75);
+        transform-origin: bottom center;
+      }
+
+      .stage-hero-card {
+        transform: scale(0.75);
+      }
+
+      .stage-hero-card.left {
+        left: -8px;
+        bottom: 198px;
+      }
+
+      .stage-hero-card.right {
+        right: -8px;
+        bottom: 192px;
+      }
+
+      .step-node {
+        width: 46px;
+        height: 34px;
+        border-width: 4px;
+      }
+
+      .step-node::before {
+        top: -28px;
+        font-size: 1.18rem;
+      }
+
+      .step-1 { left: 13%; bottom: 180px; }
+      .step-2 { left: 26%; bottom: 302px; }
+      .step-3 { left: 48%; bottom: 338px; }
+      .step-4 { left: 43%; bottom: 232px; }
+      .step-5 { left: 62%; bottom: 172px; }
+      .step-6 { right: 17%; bottom: 246px; }
+      .step-7 { right: 10%; bottom: 128px; }
+
+      .steps-village {
+        right: -26px;
+        bottom: 110px;
+        transform: scale(0.74);
+      }
+
+      .steps-bottom {
+        grid-template-columns: 1fr 1.4fr;
+        min-height: 92px;
+        gap: 10px;
+        padding: 0 12px;
+        font-size: 0.92rem;
+      }
+
+      .steps-bottom span:nth-of-type(n+3) {
+        display: none;
+      }
+
+      .story-page {
+        min-height: 920px;
+      }
+
+      .story-close {
+        top: 18px;
+        right: 16px;
+      }
+
+      .story-gold,
+      .story-props-left {
+        transform: scale(0.72);
+      }
+
+      .story-archer-small {
+        left: 20%;
+        bottom: 280px;
+      }
+
+      .story-hero-small {
+        left: 50%;
+        bottom: 290px;
+      }
+
+      .story-sword-small {
+        left: 42%;
+        bottom: 380px;
+      }
+
+      .story-arrow {
+        left: 38%;
+        bottom: 280px;
+      }
+
+      .story-speaker {
+        right: -94px;
+        transform: scale(0.78);
+        transform-origin: bottom right;
+      }
+
+      .story-dialogue {
+        left: 24px;
+        right: 96px;
+        bottom: 110px;
+        width: auto;
+        padding: 0 32px;
+        font-size: 1.02rem;
+      }
+
+      .team-level-page {
+        min-height: 880px;
+      }
+
+      .level-burst {
+        width: 280px;
+        height: 280px;
+        top: 56px;
+      }
+
+      .level-light {
+        top: 198px;
+        width: 440px;
+      }
+
+      .level-stat-row {
+        grid-template-columns: 1fr 42px 22px 42px;
+        padding: 0 10px;
+        font-size: 0.9rem;
+      }
+
+      .energy-tooltip {
+        margin: 10px 0 18px;
+      }
+
+      .dashboard-page {
+        min-height: 980px;
+      }
+
+      .dash-top {
+        left: 14px;
+        right: 14px;
+        top: 12px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .resource-pill {
+        min-width: 112px;
+        height: 36px;
+        font-size: 0.78rem;
+        padding-left: 10px;
+      }
+
+      .resource-icon,
+      .plus {
+        width: 26px;
+        height: 26px;
+      }
+
+      .dash-left {
+        top: 92px;
+        left: 14px;
+        width: 210px;
+        gap: 8px;
+      }
+
+      .profile-medal {
+        width: 78px;
+        height: 78px;
+        font-size: 2rem;
+      }
+
+      .team-plate,
+      .vip-plate {
+        width: 126px;
+        min-height: 34px;
+        font-size: 0.82rem;
+      }
+
+      .task-banner {
+        top: 100px;
+        left: 112px;
+        right: 12px;
+        width: auto;
+        min-height: 46px;
+        padding: 0 10px;
+        font-size: 0.76rem;
+      }
+
+      .task-icon {
+        width: 36px;
+        height: 36px;
+        border-width: 2px;
+      }
+
+      .quest-button {
+        width: 180px;
+        min-height: 42px;
+        grid-template-columns: 46px 1fr;
+        font-size: 0.82rem;
+      }
+
+      .quest-icon {
+        width: 34px;
+        height: 34px;
+      }
+
+      .city-layer {
+        inset: 180px 0 220px;
+      }
+
+      .sun-dome {
+        left: 18%;
+        top: 80px;
+        width: 270px;
+        height: 270px;
+      }
+
+      .merchant-house {
+        left: -14%;
+        width: 150px;
+        height: 120px;
+      }
+
+      .portal-building {
+        left: 22%;
+        width: 160px;
+        height: 170px;
+      }
+
+      .portal-core {
+        width: 92px;
+        height: 92px;
+      }
+
+      .atrium {
+        left: 58%;
+        width: 190px;
+        height: 230px;
+      }
+
+      .obelisk {
+        right: -18%;
+        width: 142px;
+        height: 280px;
+      }
+
+      .summon-label,
+      .building-label,
+      .mystery-chest {
+        font-size: 0.8rem;
+        min-width: 110px;
+        min-height: 34px;
+      }
+
+      .dash-dialogue {
+        left: 16px;
+        right: 16px;
+        bottom: 120px;
+        width: auto;
+        padding: 18px 18px 110px;
+      }
+
+      .dash-guide {
+        right: 12px;
+        transform: scale(0.74);
+        transform-origin: bottom right;
+      }
+
+      .dash-speech {
+        font-size: 0.92rem;
+        padding: 0 16px;
+      }
+
+      .bottom-nav {
+        grid-template-columns: repeat(4, 1fr);
+        min-height: 116px;
+        padding: 8px 10px;
+      }
+
+      .nav-item {
+        font-size: 0.68rem;
+      }
+
+      .nav-icon {
+        width: 40px;
+        height: 40px;
+        border-width: 3px;
+        font-size: 1rem;
+      }
+
+      .settings-stack {
+        display: none;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="topline">
+        <div class="brand-mark">GAME DESIGN DOCUMENT</div>
+        <div class="online">v0.4 <span>Pixel Web RPG</span></div>
+      </div>
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Pixel Art Web RPG · Side-Scrolling Battle Prototype</p>
+          <h1>해커톤 대모험</h1>
+          <p class="hero-copy">
+            픽셀아트 횡스크롤 전투 화면을 중심으로 만든 웹 RPG형 HTML 기획서입니다. 첫 화면에서
+            파티 HUD, 스킬바, 보스 체력, 퀘스트 상태를 보고 실제 제작할 게임의 구조를 바로 이해합니다.
+          </p>
+          <div class="reward-board" aria-label="데모 보상 미션">
+            <div class="reward-step">
+              <div class="reward-num">1</div>
+              <div class="reward-name">파티를<br>결성하라</div>
+              <div class="reward-prize">+ 전사</div>
+            </div>
+            <div class="reward-step">
+              <div class="reward-num">2</div>
+              <div class="reward-name">던전을<br>돌파하라</div>
+              <div class="reward-prize">+ 100 보석</div>
+            </div>
+            <div class="reward-step">
+              <div class="reward-num">3</div>
+              <div class="reward-name">보스를<br>격파하라</div>
+              <div class="reward-prize">+ 비밀 영웅</div>
+            </div>
+          </div>
+          <div class="mission-note">문서 목적: 첫 플레이 가능한 MVP를 만들기 위한 기능 범위, 화면 흐름, 데이터 단위, 검증 기준을 명확히 정의합니다.</div>
+          <div class="tag-row" aria-label="핵심 특징">
+            <span class="tag">캐릭터 교체</span>
+            <span class="tag">직업별 퍼즐</span>
+            <span class="tag">실시간 전투</span>
+            <span class="tag">파티 결속 게이지</span>
+            <span class="tag">보스 패턴 공략</span>
+            <a class="tag play-link" href="./pixel-rpg-game.html">실제 게임 실행</a>
+          </div>
+        </div>
+        <div class="action-stage">
+          <div class="pixel-game-shell" aria-label="픽셀아트 웹 RPG 플레이 화면 목업">
+            <div class="pixel-topbar">
+              <span>STAGE 1-3 · 불타는 숲길</span>
+              <span class="pixel-resource">659</span>
+              <span>TEAM Lv.2</span>
+            </div>
+            <div class="pixel-stage">
+              <div class="pixel-mountains"></div>
+              <div class="pixel-forest"></div>
+              <div class="pixel-platform"></div>
+              <div class="pixel-ground"></div>
+              <div class="pixel-hud">
+                <div class="hud-panel">전사 갈라하드
+                  <div class="hp-bar"><span style="--fill:82%;"></span></div>
+                  <div class="mana-bar"><span style="--fill:46%;"></span></div>
+                </div>
+                <div class="hud-panel">보스 · 화염 파수꾼
+                  <div class="boss-bar"><span style="--fill:61%;"></span></div>
+                </div>
+                <div class="pixel-quest-mini">퀘스트<br>히어로 스킬 사용 0/1</div>
+              </div>
+              <div class="pixel-ally" aria-hidden="true"></div>
+              <div class="pixel-hero" aria-hidden="true"></div>
+              <div class="pixel-slash" aria-hidden="true"></div>
+              <div class="pixel-projectile" aria-hidden="true"></div>
+              <div class="pixel-enemy" aria-hidden="true"></div>
+              <div class="pixel-boss" aria-hidden="true"></div>
+            </div>
+            <div class="pixel-bottom-ui">
+              <div class="pixel-party" aria-label="파티 슬롯">
+                <div class="pixel-party-card active" data-role="전">전사</div>
+                <div class="pixel-party-card" data-role="궁">궁수</div>
+                <div class="pixel-party-card" data-role="성">성직자</div>
+              </div>
+              <div class="pixel-skills" aria-label="스킬 슬롯">
+                <div class="pixel-skill" style="--skill-a:#2d3d78;--skill-b:#e8ae4a;">공격</div>
+                <div class="pixel-skill" style="--skill-a:#0f4b35;--skill-b:#92e85a;">회복</div>
+                <div class="pixel-skill" style="--skill-a:#4e1f6f;--skill-b:#4fc3ff;">궁극</div>
+              </div>
+            </div>
+            <div class="pixel-caption">HTML/CSS 픽셀아트 목업: 횡스크롤 전투, 파티 교체, 스킬바, 퀘스트 HUD, 보스 체력바를 한 화면에 배치합니다.</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="concept">
+      <h2>웹 RPG 기획서 개요</h2>
+      <p class="section-lead">
+        횡스크롤 RPG를 실제로 만들기 위한 기준 문서입니다. 아래 UI 목업들은 광고용 웹페이지가 아니라 게임 안에서 구현해야 할 화면의 정보 구조와 상태를 설명하는 레퍼런스입니다.
+      </p>
+      <div class="doc-note">
+        <strong>목표:</strong> 플레이어가 전사, 궁수, 성직자를 즉시 교체하며 전투와 탐험 문제를 해결하는 2D 횡스크롤 RPG MVP를 만든다. 첫 빌드는 튜토리얼 1개, 캠페인 지도, 퀘스트/보상/성장 화면, 미니보스 1종까지 포함한다.
+      </div>
+      <div class="doc-meta">
+        <div class="meta-card"><small>장르</small><strong>2D 횡스크롤 어드벤처 RPG</strong></div>
+        <div class="meta-card"><small>목표 플랫폼</small><strong>PC 웹/데스크톱 빌드 우선</strong></div>
+        <div class="meta-card"><small>권장 엔진</small><strong>Godot 4 또는 유사 2D 엔진</strong></div>
+        <div class="meta-card"><small>MVP 파티</small><strong>전사 · 궁수 · 성직자</strong></div>
+      </div>
+      <nav class="toc" aria-label="기획서 목차">
+        <a href="#core-loop">핵심 루프</a>
+        <a href="#system-spec">시스템 명세</a>
+        <a href="#data-spec">데이터 구조</a>
+        <a href="#ui-reference">화면 설계</a>
+      </nav>
+    </section>
+
+    <section id="core-loop">
+      <h2>핵심 경험</h2>
+      <div class="design-callout">
+        <article class="card">
+          <h3>한 줄 콘셉트</h3>
+          <p>다섯 직업의 영웅이 각자의 전투 역할과 탐험 능력으로 저주받은 왕국을 돌파하는 파티 교체형 횡스크롤 액션 RPG.</p>
+        </article>
+        <article class="card">
+          <h3>핵심 재미</h3>
+          <p>적 패턴과 장애물을 보고 “지금 필요한 동료”를 꺼내는 판단, 교체 직후 바로 손에 붙는 조작, 역할이 맞아떨어질 때 생기는 공략감입니다.</p>
+        </article>
+      </div>
+      <div class="loop-flow" aria-label="플레이 루프">
+        <div class="loop-step"><b>1. 로비</b><span>퀘스트 확인, 팀 편성, 보상 수령, 캠페인 진입.</span></div>
+        <div class="loop-step"><b>2. 스테이지 선택</b><span>챕터 지도에서 노드, 별 목표, 보스 위치 확인.</span></div>
+        <div class="loop-step"><b>3. 횡스크롤 진행</b><span>전투, 점프, 장애물, 직업별 장치를 반복 배치.</span></div>
+        <div class="loop-step"><b>4. 보스/클리어</b><span>직업 대응 패턴을 풀고 승리 보상과 EXP 지급.</span></div>
+        <div class="loop-step"><b>5. 성장</b><span>팀 레벨, 히어로 레벨, 스킬 강화로 다음 노드 해금.</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>웹 RPG 화면 구성</h2>
+      <p class="section-lead">
+        첫 화면의 픽셀아트 전투 목업은 실제 웹 RPG 빌드에서 우선 구현할 UI 단위를 압축한 것입니다.
+      </p>
+      <div class="grid">
+        <article class="card">
+          <h3>전장 레이어</h3>
+          <p>하늘, 산, 숲, 발판, 지면을 CSS 픽셀아트 레이어로 분리해 횡스크롤 배경 구조를 보여줍니다.</p>
+        </article>
+        <article class="card">
+          <h3>전투 HUD</h3>
+          <p>플레이어 HP/MP, 보스 체력, 현재 퀘스트 상태를 전투 중 항상 읽히는 위치에 배치합니다.</p>
+        </article>
+        <article class="card">
+          <h3>파티와 스킬바</h3>
+          <p>전사, 궁수, 성직자 슬롯과 공격/회복/궁극 스킬을 하단 조작 영역으로 고정합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="system-spec">
+      <h2>시스템 명세</h2>
+      <div class="grid two">
+        <article class="card">
+          <h3>조작 규칙</h3>
+          <ul class="spec-list">
+            <li>이동: 좌우 이동, 점프, 하강, 대시 또는 회피.</li>
+            <li>전투: 기본 공격, 고유 스킬, 궁극기, 피격 경직.</li>
+            <li>교체: 파티 슬롯 1~3 즉시 전환, 교체 쿨다운 0.8초.</li>
+            <li>입력 반응: 교체 후 0.2초 안에 조작권을 넘긴다.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>전투 규칙</h3>
+          <ul class="spec-list">
+            <li>각 적은 약점 역할을 하나 이상 가진다.</li>
+            <li>기사/방어, 궁수/공중, 성직자/회복처럼 역할 대응이 명확해야 한다.</li>
+            <li>보스는 3페이즈 이하로 시작하고, 페이즈마다 요구 직업을 바꾼다.</li>
+            <li>실패 시 마지막 체크포인트에서 10초 안에 재도전한다.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>성장 규칙</h3>
+          <ul class="spec-list">
+            <li>팀 레벨은 에너지 최대치와 히어로 레벨 상한을 올린다.</li>
+            <li>히어로 EXP는 전투 참여 여부와 무관하게 파티 전체에 기본 지급한다.</li>
+            <li>스킬은 골드와 재료로 강화하며, 튜토리얼 중 1회 강제 학습한다.</li>
+            <li>별 보상은 챕터별 누적 별 수로 상자를 해금한다.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>퀘스트 규칙</h3>
+          <ul class="spec-list">
+            <li>초반 퀘스트는 다음 버튼처럼 플레이어의 다음 행동을 지시한다.</li>
+            <li>조건, 진행도, 즉시 보상, 최종 보상을 항상 같은 위치에 둔다.</li>
+            <li>완료된 보상은 수령 전까지 강조하고, 수령 후 다음 퀘스트를 활성화한다.</li>
+            <li>메인 보상은 장기 목표로 고정 노출한다.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="data-spec">
+      <h2>데이터 구조 초안</h2>
+      <p class="section-lead">
+        실제 구현 시 스프레드시트, JSON, Godot Resource 등으로 옮길 수 있는 최소 데이터 단위입니다.
+      </p>
+      <div class="data-schema">
+        <article class="schema-card">
+          <h3>Hero</h3>
+          <code>{
+  id: "thea",
+  role: "healer",
+  line: "back",
+  stat: "int",
+  level: 1,
+  skills: ["heal_beam", "holy_ray"]
+}</code>
+        </article>
+        <article class="schema-card">
+          <h3>StageNode</h3>
+          <code>{
+  id: "chapter1_03",
+  costEnergy: 6,
+  starGoals: ["clear", "no_death", "under_180s"],
+  unlock: "hero_level >= 3",
+  rewards: ["gold", "exp", "potion"]
+}</code>
+        </article>
+        <article class="schema-card">
+          <h3>Quest</h3>
+          <code>{
+  id: "magic_path_01",
+  condition: "tutorial_complete",
+  progress: "1/1",
+  reward: { gold: 1000 },
+  next: "magic_path_02"
+}</code>
+        </article>
+      </div>
+    </section>
+
+    <section id="ui-reference">
+      <h2>화면 설계 레퍼런스</h2>
+      <p class="section-lead">
+        아래 화면들은 구현할 게임 UI의 정보 구조를 설명하는 목업입니다. Hero Wars 레퍼런스에서 가져온 것은 흐름과 정보 배치 방식이며, 실제 게임의 그래픽/브랜드는 별도로 제작합니다.
+      </p>
+      <div class="reference-label">UI/UX 목업 시작</div>
+    </section>
+
+    <section id="mvp">
+      <h2>보상 페이지</h2>
+      <p class="section-lead">
+        전투 승리 직후 플레이어가 성장과 전리품을 즉시 이해하는 화면입니다. 핵심 정보는 승리, 별 등급, 레벨/경험치/골드, 새 영웅, 전리품, 확인 버튼 순서로 읽힙니다.
+      </p>
+      <div class="reward-page" aria-label="승리 보상 페이지 목업">
+        <div class="reward-nav">
+          <div class="reward-logo">HACKATHON<br>QUEST</div>
+          <div class="reward-menu">
+            <span>KO</span>
+            <span>메뉴</span>
+            <span class="hamburger" aria-hidden="true"><i></i><i></i><i></i></span>
+          </div>
+        </div>
+        <div class="reward-modal">
+          <div class="victory-ribbon">승리!</div>
+          <div class="stars" aria-label="별 3개">
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+          </div>
+          <div class="reward-summary">
+            <div class="reward-stat">
+              <span>
+                <small>레벨</small>
+                <strong>1</strong>
+              </span>
+            </div>
+            <div class="reward-stat">
+              <span>
+                <small>경험치</small>
+                <strong>+12</strong>
+              </span>
+            </div>
+            <div class="reward-stat">
+              <span>
+                <small>골드</small>
+                <strong><span class="coin-dot"></span>523</strong>
+              </span>
+            </div>
+          </div>
+          <div class="hero-reward-card">
+            <div class="hero-frame" aria-label="획득 영웅 카드">
+              <div class="hero-hair"></div>
+              <div class="hero-face"></div>
+              <div class="hero-armor"></div>
+            </div>
+            <div class="exp-bar" aria-label="경험치 진행도"><div class="exp-fill"></div></div>
+            <div class="exp-label">EXP +20</div>
+          </div>
+          <div class="loot-title">전리품</div>
+          <div class="loot-row" aria-label="전리품 목록">
+            <div class="loot-item">검<b>1</b></div>
+            <div class="loot-item">보<b>3</b></div>
+            <div class="loot-item">신<b>2</b></div>
+            <div class="loot-item">약<b>1</b></div>
+            <div class="loot-item">영<b>1</b></div>
+            <div class="loot-item">조<b>1</b></div>
+          </div>
+          <a href="#mvp" class="confirm-button">확인</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>팀 레벨링 시스템</h2>
+      <p class="section-lead">
+        전투 승리 후 팀 레벨, 계정 경험치, 골드, 파티원별 성장치를 동시에 보여주는 결과 화면입니다. 플레이어는 팀 전체 성장과 개별 히어로 EXP 진행도를 한 번에 확인합니다.
+      </p>
+      <div class="team-leveling-system" aria-label="팀 레벨링 시스템 결과 화면 목업">
+        <div class="team-victory-modal">
+          <div class="team-victory-ribbon">승리!</div>
+          <div class="team-level-stars" aria-label="별 3개">
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+          </div>
+          <div class="team-level-summary">
+            <div class="team-level-stat">
+              <span>
+                <small>레벨</small>
+                <strong>2</strong>
+              </span>
+            </div>
+            <div class="team-level-stat">
+              <span>
+                <small>경험치</small>
+                <strong>+6</strong>
+              </span>
+            </div>
+            <div class="team-level-stat">
+              <span>
+                <small>골드</small>
+                <strong><span class="coin-dot"></span>659</strong>
+              </span>
+            </div>
+            <div class="info-button">정보</div>
+          </div>
+          <div class="team-exp-row" aria-label="팀원 경험치 분배">
+            <div class="team-exp-card">
+              <div class="member-card" data-level="3" style="--member-a:#233e7b;--member-b:#bd3141;--member-hair:#17213b;">
+                <div class="member-hair"></div>
+                <div class="member-body"></div>
+              </div>
+              <div class="member-exp"><span style="--exp:64%;"></span></div>
+              <div class="exp-gain"><i>EXP</i><span>+20</span></div>
+            </div>
+            <div class="team-exp-card">
+              <div class="member-card" data-level="1" style="--member-face:#d6a580;--member-a:#f5eee4;--member-b:#a77048;--member-hair:#e8dbc8;">
+                <div class="member-hair"></div>
+                <div class="member-body"></div>
+              </div>
+              <div class="member-exp"><span style="--exp:58%;"></span></div>
+              <div class="exp-gain"><i>EXP</i><span>+20</span></div>
+            </div>
+            <div class="team-exp-card">
+              <div class="member-card" data-level="3" style="--member-face:#efc18c;--member-a:#173a58;--member-b:#d8a83a;--member-hair:#e6c94d;">
+                <div class="member-hair"></div>
+                <div class="member-body"></div>
+              </div>
+              <div class="member-exp"><span style="--exp:22%;"></span></div>
+              <div class="exp-gain"><i>EXP</i><span>+20</span></div>
+            </div>
+          </div>
+          <div class="team-loot-title">전리품:</div>
+          <div class="team-loot-row" aria-label="팀 레벨링 전리품">
+            <div class="loot-item">검<b>1</b></div>
+            <div class="loot-item">주<b>2</b></div>
+            <div class="loot-item">약<b>1</b></div>
+          </div>
+          <a href="#mvp" class="confirm-button">확인</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>신규 히어로 페이지</h2>
+      <p class="section-lead">
+        보상에서 획득한 캐릭터를 바로 확인하는 화면입니다. 좌측 정보 패널은 이름, 레벨, 역할, 포지션, 성향, 스킬을 빠르게 보여주고 우측은 캐릭터 액션 비주얼에 집중합니다.
+      </p>
+      <div class="hero-detail-page" aria-label="신규 히어로 상세 페이지 목업">
+        <div class="forest-lines" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="hero-close" aria-hidden="true">×</div>
+        <div class="hero-info-panel">
+          <div class="hero-kicker">신규 히어로</div>
+          <div class="hero-name-strip">아르테미스</div>
+          <div class="hero-level">레벨: 1 ★</div>
+          <div class="hero-meta">
+            <div class="hero-meta-row"><span class="meta-icon">⌁</span><span>명사수</span></div>
+            <div class="hero-meta-row"><span class="meta-icon">≫</span><span>후방 라인</span></div>
+            <div class="hero-meta-row"><span class="meta-icon">▰</span><span>민첩</span></div>
+          </div>
+          <div class="skill-title">히어로의 스킬:</div>
+          <div class="skill-row" aria-label="히어로 스킬">
+            <div class="skill-icon" style="--skill-a:#182c4f;--skill-b:#db7a2b;--skill-border:#4aa7ff;">화</div>
+            <div class="skill-icon" style="--skill-a:#0e2452;--skill-b:#f9e984;--skill-border:#48db45;">관</div>
+            <div class="skill-icon" style="--skill-a:#214061;--skill-b:#fff3a4;--skill-border:#4386ff;">섬</div>
+            <div class="skill-icon" style="--skill-a:#3a2562;--skill-b:#d9a348;--skill-border:#db3fff;">각</div>
+          </div>
+          <div class="hero-story-link">▤ 히어로 스토리 읽기</div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="cape"></div>
+          <div class="bow"></div>
+          <div class="bow-string"></div>
+          <div class="hood"></div>
+          <div class="archer-head"></div>
+          <div class="archer-body"></div>
+          <div class="arm-a"></div>
+          <div class="arm-b"></div>
+          <div class="leg-one"></div>
+          <div class="leg-two"></div>
+        </div>
+        <div class="deploy-button">출동해요!</div>
+        <div class="swap-button">↻</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>팀원 스킬 화면</h2>
+      <p class="section-lead">
+        새 팀원의 역할과 스킬을 바로 이해시키는 상세 화면입니다. 선택된 스킬은 하단 툴팁으로 효과와 수치를 설명하고, 치유/지원 캐릭터의 전투 투입 맥락을 강조합니다.
+      </p>
+      <div class="team-skill-page" aria-label="팀원 스킬 상세 페이지 목업">
+        <div class="skill-forest" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="hero-close" aria-hidden="true">×</div>
+        <div class="team-skill-panel">
+          <div class="hero-kicker">신규 히어로</div>
+          <div class="team-skill-name">테아 <i class="leaf-mark" aria-hidden="true"><span></span></i></div>
+          <div class="hero-level">레벨: 1 ★</div>
+          <div class="hero-meta">
+            <div class="hero-meta-row"><span class="meta-icon">✚</span><span>힐러, 지원</span></div>
+            <div class="hero-meta-row"><span class="meta-icon">≫</span><span>후방 라인</span></div>
+            <div class="hero-meta-row"><span class="meta-icon">▰</span><span>지능</span></div>
+          </div>
+          <div class="skill-title">히어로의 스킬:</div>
+          <div class="skill-row" aria-label="팀원 스킬">
+            <div class="skill-icon" style="--skill-a:#0d4b2f;--skill-b:#baff6b;--skill-border:#84df8a;">치</div>
+            <div class="skill-icon" style="--skill-a:#0b4c32;--skill-b:#48d65a;--skill-border:#43d75a;">광</div>
+            <div class="skill-icon" style="--skill-a:#4f1810;--skill-b:#f59a41;--skill-border:#4b88ff;">침</div>
+            <div class="skill-icon" style="--skill-a:#164c35;--skill-b:#5cff85;--skill-border:#db3fff;">손</div>
+          </div>
+          <div class="hero-story-link">▤ 히어로 스토리 읽기</div>
+        </div>
+        <div class="healer-art" aria-hidden="true">
+          <div class="healer-aura"></div>
+          <div class="healer-staff"><div class="staff-orb"></div></div>
+          <div class="healer-hair"></div>
+          <div class="healer-face"></div>
+          <div class="healer-arm-left"></div>
+          <div class="healer-arm-right"></div>
+          <div class="healer-body"></div>
+        </div>
+        <div class="team-skill-tooltip">
+          <strong>치유 빔</strong>
+          테아가 가장 적은 체력의 아군에게 힘을 집중해 치유합니다.<br>
+          치유: <span class="heal-amount">115</span> (마법 공격에 따라 다름)
+        </div>
+        <a href="#mvp" class="team-skill-button">훌륭해요!</a>
+        <div class="swap-button">↻</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>스테이지 설명</h2>
+      <p class="section-lead">
+        챕터 진입 전 월드맵에서 현재 목표를 알려주는 화면입니다. 푸른 숲에서 불타는 전장으로 이어지는 대비를 보여주고, 대사 박스로 다음 목표를 명확히 전달합니다.
+      </p>
+      <div class="stage-page" aria-label="스테이지 설명 월드맵 목업">
+        <div class="stage-top-bar">1장: 불의 지배</div>
+        <div class="stage-close">×</div>
+        <div class="map-region" aria-hidden="true">
+          <div class="river"></div>
+          <div class="waterfall"></div>
+          <div class="burnt-zone"></div>
+          <div class="stage-path"></div>
+          <div class="tree"></div>
+          <div class="tree"></div>
+          <div class="tree"></div>
+          <div class="tree"></div>
+          <div class="tree"></div>
+          <div class="tree"></div>
+          <div class="stage-node active node-1"></div>
+          <div class="stage-node node-2"></div>
+          <div class="stage-node node-3"></div>
+          <div class="stage-node node-4"></div>
+          <div class="stage-node node-5"></div>
+          <div class="boss-node">BOSS</div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-portrait"></div>
+          <div class="chapter-stars">★★★</div>
+        </div>
+        <div class="dialogue-box">
+          <div class="speech-bubble">달려요, 화염 군단이 마을로 향하고 있어요.</div>
+          <div class="guide-character" aria-hidden="true"></div>
+        </div>
+        <div class="stage-bottom">
+          <span>★ 3/30</span>
+          <div class="progress-track" aria-label="챕터 진행도"><div class="progress-fill"></div></div>
+          <span>★ 6 ?</span>
+          <span>★ 15 상자</span>
+          <span>★ 30 ?</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>단계별 스테이지</h2>
+      <p class="section-lead">
+        챕터 안에서 여러 전투 노드가 순차적으로 열리는 캠페인 지도입니다. 클리어한 스테이지, 잠긴 스테이지, 보스전, 별 보상 진행도와 튜토리얼 안내를 한 화면에서 보여줍니다.
+      </p>
+      <div class="stage-steps-page" aria-label="단계별 캠페인 스테이지 지도 목업">
+        <div class="stage-top-bar">1장: 불의 지배</div>
+        <div class="stage-close">×</div>
+        <div class="steps-map" aria-hidden="true">
+          <div class="steps-river"></div>
+          <div class="waterfall"></div>
+          <div class="steps-burn-zone"></div>
+          <div class="steps-village"></div>
+          <div class="steps-path"></div>
+          <div class="steps-tree t1"></div>
+          <div class="steps-tree t2"></div>
+          <div class="steps-tree t3"></div>
+          <div class="steps-tree t4"></div>
+          <div class="steps-tree t5"></div>
+          <div class="steps-tree t6"></div>
+          <div class="step-node cleared step-1" data-stars="★★★"></div>
+          <div class="step-node cleared step-2" data-stars="★★★"></div>
+          <div class="step-node focus step-3" data-stars="★★★"></div>
+          <div class="step-node step-4" data-stars="★"></div>
+          <div class="step-node step-5" data-stars=""></div>
+          <div class="step-node locked step-6" data-stars="★★★"></div>
+          <div class="step-node locked step-7" data-stars=""></div>
+        </div>
+        <div class="stage-hero-card left">
+          <div class="chapter-portrait"></div>
+          <div class="chapter-stars">★★★</div>
+        </div>
+        <div class="stage-hero-card right">
+          <div class="chapter-portrait"></div>
+          <div class="locked-stars">★★★</div>
+        </div>
+        <div class="stage-boss-figure" aria-hidden="true"></div>
+        <div class="stage-coach" aria-hidden="true"></div>
+        <div class="stage-tutorial-dialogue">
+          <div class="dialogue-name">오라클</div>
+          승리하고 싶다면 먼저 <em>히어로를 업그레이드</em>해야 합니다. 방법을 알려드릴게요!
+          <span class="next-label">다음 ›</span>
+        </div>
+        <div class="steps-bottom">
+          <span>★ 12/30</span>
+          <div class="progress-track" aria-label="단계별 스테이지 별 보상 진행도"><div class="progress-fill"></div></div>
+          <span>★ 6 ?</span>
+          <span>★ 15 상자</span>
+          <span>★ 30 ?</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>스토리 페이지</h2>
+      <p class="section-lead">
+        전투 전후에 짧게 들어가는 컷신 화면입니다. 배경은 평화로운 숲길, 중앙에는 파티원, 우측 전경에는 대사를 말하는 기사 캐릭터를 배치해 다음 행동을 자연스럽게 안내합니다.
+      </p>
+      <div class="story-page" aria-label="스토리 컷신 페이지 목업">
+        <div class="story-close">×</div>
+        <div class="story-sky"></div>
+        <div class="story-tree"></div>
+        <div class="story-tree"></div>
+        <div class="story-tree"></div>
+        <div class="story-tree"></div>
+        <div class="story-tree"></div>
+        <div class="story-ground"></div>
+        <div class="story-path"></div>
+        <div class="story-props-left">
+          <div class="crate"></div>
+          <div class="barrel"></div>
+        </div>
+        <div class="story-gold"></div>
+        <div class="story-archer-small"></div>
+        <div class="story-hero-small"></div>
+        <div class="story-sword-small"></div>
+        <div class="story-arrow"></div>
+        <div class="story-speaker"></div>
+        <div class="story-dialogue">함정에 걸렸군요. 아슬아슬했어요.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>팀 레벨업 페이지</h2>
+      <p class="section-lead">
+        전투 보상 이후 팀 전체 성장을 알려주는 모달입니다. 새 팀 레벨, 최대 에너지, 최대 히어로 레벨, 에너지 보상과 설명 툴팁을 한 번에 보여줍니다.
+      </p>
+      <div class="team-level-page" aria-label="팀 레벨업 보상 모달 목업">
+        <div class="level-modal">
+          <div class="level-burst"></div>
+          <div class="level-light"></div>
+          <div class="level-orb">2</div>
+          <div class="level-title">새로운 팀 레벨!</div>
+          <div class="level-stats">
+            <div class="level-stat-row">
+              <span>최대 에너지:</span>
+              <b>60</b>
+              <i>»</i>
+              <strong>62</strong>
+            </div>
+            <div class="level-stat-row">
+              <span>최대 히어로 레벨:</span>
+              <b>10</b>
+              <i>»</i>
+              <strong>11</strong>
+            </div>
+          </div>
+          <div class="energy-reward-label">보상:</div>
+          <div class="energy-card">ϟ<b>6</b></div>
+          <div class="energy-tooltip">
+            <strong>에너지</strong>
+            캠페인 미션을 수행할 수 있게 해줍니다
+          </div>
+          <a href="#mvp" class="level-confirm">확인</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>대시보드</h2>
+      <p class="section-lead">
+        플레이어가 가장 자주 돌아오는 메인 로비입니다. 자원, 퀘스트, 캠페인 진입, 소울 아트리움, 상점, 하단 메뉴와 튜토리얼 안내를 한 화면에 배치합니다.
+      </p>
+      <div class="dashboard-page" aria-label="메인 로비 대시보드 목업">
+        <div class="dash-top" aria-label="자원 상태">
+          <div class="resource-pill"><span class="resource-icon gem"></span><span>0</span><span class="plus">+</span></div>
+          <div class="resource-pill"><span class="resource-icon">●</span><span>16 787</span><span class="plus">+</span></div>
+          <div class="resource-pill"><span class="resource-icon energy">ϟ</span><span>40</span><span class="plus">+</span></div>
+        </div>
+        <div class="dash-left">
+          <div class="profile-medal">Ⅱ</div>
+          <div class="team-plate">Team 2918482</div>
+          <div class="vip-plate">VIP 0</div>
+          <div class="quest-stack">
+            <div class="quest-button"><span class="quest-icon">7</span><span>일일 퀘스트</span></div>
+            <div class="quest-button"><span class="quest-icon">✉</span><span>메일</span></div>
+            <div class="quest-button"><span class="quest-icon">🎁</span><span>일일 보상</span></div>
+          </div>
+        </div>
+        <div class="task-banner">
+          <div class="task-icon">★</div>
+          <span>입문자 튜토리얼을 완료하세요 1/1</span>
+        </div>
+        <div class="city-layer" aria-hidden="true">
+          <div class="sun-dome"></div>
+          <div class="building merchant-house"></div>
+          <div class="building portal-building"><div class="portal-core"></div></div>
+          <div class="building atrium"></div>
+          <div class="building obelisk"></div>
+        </div>
+        <div class="summon-label">소울 아트리움</div>
+        <div class="building-label label-merchant">상인</div>
+        <div class="building-label label-campaign">캠페인</div>
+        <div class="mystery-chest">신비로운 상자 ?</div>
+        <div class="dash-dialogue">
+          <div class="dash-speech"><span><em>소울 아트리움</em>에서 소환을 통해 새로운 히어로를 잠금 해제하고 팀을 진화시키세요!</span></div>
+          <div class="dash-guide"></div>
+        </div>
+        <div class="bottom-nav" aria-label="하단 메뉴">
+          <div class="nav-item"><span class="nav-icon">⚑</span><span>길드</span></div>
+          <div class="nav-item"><span class="nav-icon">…</span><span>채팅</span></div>
+          <div class="nav-item"><span class="nav-icon">▣</span><span>물품 저장고</span></div>
+          <div class="nav-item"><span class="nav-icon">卷</span><span>퀘스트</span></div>
+          <div class="nav-item"><span class="nav-icon">H</span><span>히어로</span></div>
+          <div class="nav-item"><span class="nav-icon">杯</span><span>순위</span></div>
+          <div class="nav-item"><span class="nav-icon">✦</span><span>선물</span></div>
+          <div class="settings-stack"><span class="setting-button">□</span><span class="setting-button">⚙</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>퀘스트 시스템</h2>
+      <p class="section-lead">
+        초반 플레이어를 다음 행동으로 이끄는 단계형 퀘스트 화면입니다. 각 퀘스트는 조건, 보상, 수령 상태를 명확히 보여주고, 최종 보상 진행도와 튜토리얼 안내를 함께 제공합니다.
+      </p>
+      <div class="quest-system-page" aria-label="마법의 길 퀘스트 시스템 목업">
+        <div class="quest-hall" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div class="quest-close">×</div>
+        <div class="quest-header">
+          <div class="quest-title"><span class="quest-info-dot">i</span><span>마법의 길</span></div>
+          <div class="quest-subtitle">마법의 길을 완료하고 에픽 히어로를 받으세요!</div>
+        </div>
+        <div class="quest-track" aria-label="퀘스트 단계 목록">
+          <div class="quest-card active">
+            <div>
+              <div class="quest-num">01</div>
+              <div class="quest-label">퀘스트</div>
+            </div>
+            <div class="quest-task">입문자 튜토리얼을<br>완료하세요<br>(1/1)</div>
+            <div class="quest-reward-icon" style="--reward-a:#7d3b0b;--reward-b:#f5c11f;">●<b>1000</b></div>
+            <div class="quest-claim">받기</div>
+            <div class="quest-card-step"><span>1</span></div>
+          </div>
+          <div class="quest-card">
+            <div>
+              <div class="quest-num">02</div>
+              <div class="quest-label">퀘스트</div>
+            </div>
+            <div class="quest-task">도시 게이트 미션을<br>완료하세요<br>(1/1)</div>
+            <div class="quest-reward-icon" style="--reward-a:#173561;--reward-b:#e2bb44;--reward-glow:#2a68c9;">EXP<b>15</b></div>
+            <div class="quest-claim">받기</div>
+            <div class="quest-card-step"><span>2</span></div>
+          </div>
+          <div class="quest-card">
+            <div>
+              <div class="quest-num">03</div>
+              <div class="quest-label">퀘스트</div>
+            </div>
+            <div class="quest-task">영웅 장비를<br>강화하세요<br>(1/1)</div>
+            <div class="quest-reward-icon" style="--reward-a:#1d1e22;--reward-b:#9c2d17;--reward-glow:#3d3d3d;">장<b>1</b></div>
+            <div class="quest-claim">받기</div>
+            <div class="quest-card-step"><span>3</span></div>
+          </div>
+          <div class="quest-card">
+            <div>
+              <div class="quest-num">04</div>
+              <div class="quest-label">퀘스트</div>
+            </div>
+            <div class="quest-task">히어로의 스킬을<br>사용하세요<br>(0/1)</div>
+            <div class="quest-reward-icon" style="--reward-a:#4b160f;--reward-b:#ef9d40;--reward-glow:#f6d27a;">약<b>5</b></div>
+            <div class="quest-claim done">완료</div>
+            <div class="quest-card-step"><span>4</span></div>
+          </div>
+          <div class="quest-card dim">
+            <div>
+              <div class="quest-num">05</div>
+              <div class="quest-label">퀘스트</div>
+            </div>
+            <div class="quest-task">전사에게 아이템을<br>장착시키세요<br>(0/6)</div>
+            <div class="quest-reward-icon" style="--reward-a:#7d3b0b;--reward-b:#f5c11f;">●<b>100</b></div>
+            <div class="quest-claim done">잠김</div>
+            <div class="quest-card-step"><span>5</span></div>
+          </div>
+        </div>
+        <div class="quest-guide" aria-hidden="true"></div>
+        <div class="quest-dialogue">
+          <div class="quest-dialogue-name">갤러해드</div>
+          마법의 길 퀘스트를 완료하면 보상을 받습니다. 첫 보상을 받아보세요!
+        </div>
+        <div class="quest-bottom">
+          <div class="quest-main-goal">
+            <span class="quest-scroll-icon">▰</span>
+            <span>마법의 길 퀘스트를 모두 완료하고<br>폴리오를 잠금 해제하세요!</span>
+          </div>
+          <div class="quest-progress-number">3 / 200</div>
+          <div class="quest-main-reward"></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>게임 구조</h2>
+      <p class="section-lead">
+        마을 준비, 스테이지 탐험, 전투와 퍼즐, 보스전, 성장 보상이 하나의 반복 루프를 만듭니다.
+      </p>
+      <div class="grid">
+        <article class="card">
+          <h3>플레이 루프</h3>
+          <p>마을에서 준비하고 스테이지를 선택한 뒤, 탐험과 전투를 거쳐 보스를 쓰러뜨리고 성장 보상을 얻습니다.</p>
+        </article>
+        <article class="card">
+          <h3>파티 운용</h3>
+          <p>싱글 플레이 기준으로 활성 캐릭터를 즉시 교체합니다. 비활성 동료는 간단한 AI로 따라오며 보조합니다.</p>
+        </article>
+        <article class="card">
+          <h3>MVP 목표</h3>
+          <p>전사, 궁수, 성직자 3직업과 튜토리얼 스테이지 하나로 핵심 재미를 먼저 증명합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>SVG 아키텍처</h2>
+      <p class="section-lead">
+        구현 관점의 시스템 분해도입니다. 게임 엔진의 씬 루프가 입력, 파티, 전투, 탐험, 성장 데이터를 조율합니다.
+      </p>
+      <div class="architecture-wrap" role="img" aria-label="횡스크롤 RPG 시스템 아키텍처 SVG 다이어그램">
+        <svg viewBox="0 0 1180 720" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#d19542"></path>
+            </marker>
+            <marker id="arrowSoft" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#c4ad82"></path>
+            </marker>
+            <linearGradient id="coreGlow" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#2d3840"></stop>
+              <stop offset="1" stop-color="#151b20"></stop>
+            </linearGradient>
+          </defs>
+
+          <rect x="1" y="1" width="1178" height="718" fill="#0d1216" stroke="#a97835" stroke-width="2" rx="10"></rect>
+          <text x="40" y="54" class="svg-title">해커톤 대모험 시스템 아키텍처</text>
+          <text x="40" y="80" class="svg-small">Godot 4 기준 권장 구조. 다른 엔진에서도 동일한 책임 분리로 옮길 수 있습니다.</text>
+
+          <rect x="430" y="126" width="320" height="112" fill="url(#coreGlow)" stroke="#e8ae4a" stroke-width="3" rx="8"></rect>
+          <text x="590" y="166" text-anchor="middle" class="svg-label">Game Scene Loop</text>
+          <text x="590" y="190" text-anchor="middle" class="svg-small">프레임 업데이트, 상태 전환, 씬 로딩</text>
+          <text x="590" y="212" text-anchor="middle" class="svg-small">월드, 전투, UI를 한 흐름으로 조율</text>
+
+          <rect x="56" y="128" width="210" height="92" class="svg-box"></rect>
+          <text x="161" y="162" text-anchor="middle" class="svg-label">Input Mapper</text>
+          <text x="161" y="187" text-anchor="middle" class="svg-small">키보드, 패드 입력</text>
+          <text x="161" y="207" text-anchor="middle" class="svg-small">공격, 점프, 교체 명령</text>
+
+          <rect x="56" y="292" width="210" height="112" class="svg-box"></rect>
+          <text x="161" y="326" text-anchor="middle" class="svg-label">Party Controller</text>
+          <text x="161" y="351" text-anchor="middle" class="svg-small">활성 캐릭터 전환</text>
+          <text x="161" y="371" text-anchor="middle" class="svg-small">동료 AI 추적</text>
+          <text x="161" y="391" text-anchor="middle" class="svg-small">파티 체력과 결속 게이지</text>
+
+          <rect x="56" y="480" width="210" height="108" class="svg-box"></rect>
+          <text x="161" y="514" text-anchor="middle" class="svg-label">Character Modules</text>
+          <text x="161" y="539" text-anchor="middle" class="svg-small">전사, 기사, 궁수</text>
+          <text x="161" y="559" text-anchor="middle" class="svg-small">마법사, 성직자</text>
+          <text x="161" y="579" text-anchor="middle" class="svg-small">스킬, 애니메이션, 탐험 능력</text>
+
+          <rect x="382" y="292" width="218" height="112" class="svg-box"></rect>
+          <text x="491" y="326" text-anchor="middle" class="svg-label">Combat System</text>
+          <text x="491" y="351" text-anchor="middle" class="svg-small">피격, 판정, 쿨다운</text>
+          <text x="491" y="371" text-anchor="middle" class="svg-small">약점, 상태 이상</text>
+          <text x="491" y="391" text-anchor="middle" class="svg-small">보스 패턴 트리거</text>
+
+          <rect x="636" y="292" width="218" height="112" class="svg-box"></rect>
+          <text x="745" y="326" text-anchor="middle" class="svg-label">Exploration System</text>
+          <text x="745" y="351" text-anchor="middle" class="svg-small">플랫폼, 레버, 봉인문</text>
+          <text x="745" y="371" text-anchor="middle" class="svg-small">직업별 장애물</text>
+          <text x="745" y="391" text-anchor="middle" class="svg-small">숏컷과 숨겨진 보상</text>
+
+          <rect x="914" y="128" width="210" height="92" class="svg-box"></rect>
+          <text x="1019" y="162" text-anchor="middle" class="svg-label">Stage Manager</text>
+          <text x="1019" y="187" text-anchor="middle" class="svg-small">마을, 숲, 폐성, 유적</text>
+          <text x="1019" y="207" text-anchor="middle" class="svg-small">체크포인트와 씬 전환</text>
+
+          <rect x="914" y="292" width="210" height="112" class="svg-box"></rect>
+          <text x="1019" y="326" text-anchor="middle" class="svg-label">Enemy & Boss AI</text>
+          <text x="1019" y="351" text-anchor="middle" class="svg-small">일반 적 행동</text>
+          <text x="1019" y="371" text-anchor="middle" class="svg-small">보스 페이즈</text>
+          <text x="1019" y="391" text-anchor="middle" class="svg-small">역할별 대응 패턴</text>
+
+          <rect x="914" y="480" width="210" height="108" class="svg-box"></rect>
+          <text x="1019" y="514" text-anchor="middle" class="svg-label">Progression Data</text>
+          <text x="1019" y="539" text-anchor="middle" class="svg-small">장비, 스킬 트리</text>
+          <text x="1019" y="559" text-anchor="middle" class="svg-small">마을 성장</text>
+          <text x="1019" y="579" text-anchor="middle" class="svg-small">저장과 해금 상태</text>
+
+          <rect x="382" y="500" width="218" height="88" class="svg-box"></rect>
+          <text x="491" y="535" text-anchor="middle" class="svg-label">UI / HUD</text>
+          <text x="491" y="560" text-anchor="middle" class="svg-small">체력, 스킬 쿨다운, 보스바</text>
+
+          <rect x="636" y="500" width="218" height="88" class="svg-box"></rect>
+          <text x="745" y="535" text-anchor="middle" class="svg-label">Audio / Feedback</text>
+          <text x="745" y="560" text-anchor="middle" class="svg-small">타격감, 경고음, UI 반응</text>
+
+          <path d="M266 174 C330 174 354 178 430 178" class="svg-line"></path>
+          <path d="M590 238 C590 258 560 270 524 292" class="svg-line"></path>
+          <path d="M590 238 C590 258 676 270 712 292" class="svg-line"></path>
+          <path d="M750 178 C820 178 852 174 914 174" class="svg-line"></path>
+          <path d="M266 348 C306 348 336 348 382 348" class="svg-line"></path>
+          <path d="M266 348 C332 408 330 520 382 544" class="svg-soft-line"></path>
+          <path d="M161 220 C161 246 161 266 161 292" class="svg-line"></path>
+          <path d="M161 404 C161 432 161 452 161 480" class="svg-line"></path>
+          <path d="M600 348 C616 348 620 348 636 348" class="svg-soft-line"></path>
+          <path d="M854 348 C878 348 890 348 914 348" class="svg-line"></path>
+          <path d="M1019 404 C1019 432 1019 452 1019 480" class="svg-line"></path>
+          <path d="M914 536 C882 536 876 536 854 536" class="svg-soft-line"></path>
+          <path d="M491 404 C491 438 491 464 491 500" class="svg-soft-line"></path>
+          <path d="M745 404 C745 438 745 464 745 500" class="svg-soft-line"></path>
+          <path d="M914 174 C852 238 834 250 804 292" class="svg-soft-line"></path>
+
+          <rect x="56" y="635" width="1068" height="42" fill="#13191e" stroke="#a97835" stroke-width="1" rx="6"></rect>
+          <text x="590" y="662" text-anchor="middle" class="svg-small">
+            핵심 원칙: 입력은 명령으로, 캐릭터는 모듈로, 전투와 탐험은 독립 시스템으로 분리해 직업 추가 비용을 낮춘다.
+          </text>
+        </svg>
+      </div>
+    </section>
+
+    <section>
+      <h2>직업별 역할</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>전사</h3>
+          <p>근접 돌파와 벽 파괴. 보스 핵이 노출되는 짧은 순간에 큰 피해를 넣습니다.</p>
+        </article>
+        <article class="card">
+          <h3>기사</h3>
+          <p>정면 방어와 발판 고정. 강한 패턴을 받아내고 파티가 반격할 시간을 만듭니다.</p>
+        </article>
+        <article class="card">
+          <h3>궁수</h3>
+          <p>공중 적 처리와 원거리 스위치. 전투와 퍼즐 양쪽에서 화면 바깥 문제를 해결합니다.</p>
+        </article>
+        <article class="card">
+          <h3>마법사</h3>
+          <p>범위 제어와 봉인 해제. 다수의 적을 묶고 원소 장치를 활성화합니다.</p>
+        </article>
+        <article class="card">
+          <h3>성직자</h3>
+          <p>회복과 정화. 실수를 복구하고 저주 지대, 상태 이상, 장기전을 담당합니다.</p>
+        </article>
+        <article class="card">
+          <h3>파티 결속</h3>
+          <p>방어 성공, 약점 공략, 회복, 콤보로 결속 게이지를 채워 합동기 또는 궁극기를 사용합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>보스 패턴 설계</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>패턴</th>
+            <th>대응 직업</th>
+            <th>플레이어가 배우는 것</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>촉수 내려찍기</td>
+            <td>기사</td>
+            <td>강한 공격은 회피만이 아니라 방어로 반격 창을 만들 수 있습니다.</td>
+          </tr>
+          <tr>
+            <td>공중 눈알 소환</td>
+            <td>궁수</td>
+            <td>화면 위협을 빠르게 줄여야 지상 전투가 안정됩니다.</td>
+          </tr>
+          <tr>
+            <td>저주 장판</td>
+            <td>성직자</td>
+            <td>전투 중 공간을 회복하고 안전지대를 다시 확보합니다.</td>
+          </tr>
+          <tr>
+            <td>보호막 패턴</td>
+            <td>마법사</td>
+            <td>피해량보다 먼저 봉인 해제 조건을 찾아야 합니다.</td>
+          </tr>
+          <tr>
+            <td>핵 노출</td>
+            <td>전사</td>
+            <td>짧은 딜 타이밍에는 근접 폭발력이 가장 큰 보상을 줍니다.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>MVP 범위</h2>
+      <div class="grid two">
+        <article class="card">
+          <h3>포함</h3>
+          <ul>
+            <li>전사, 궁수, 성직자 3직업</li>
+            <li>튜토리얼 스테이지 1개</li>
+            <li>일반 적 3종과 미니보스 1종</li>
+            <li>캐릭터 교체, 기본 공격, 회피, 고유 스킬</li>
+            <li>직업별 장애물 3종과 전투 HUD</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>제외</h3>
+          <ul>
+            <li>온라인 멀티플레이</li>
+            <li>전체 5막 월드</li>
+            <li>복잡한 장비 파밍</li>
+            <li>음성 연출</li>
+            <li>절차 생성 던전</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>로드맵</h2>
+      <div class="roadmap">
+        <article class="card">
+          <div>
+            <h3>플레이 가능한 전투 원형</h3>
+            <p>이동, 점프, 공격, 적 피격, 체력 시스템, 테스트 맵을 먼저 완성합니다.</p>
+          </div>
+        </article>
+        <article class="card">
+          <div>
+            <h3>파티 교체와 직업성</h3>
+            <p>3직업 교체, 고유 스킬, 직업별 탐험 장애물, 간단한 동료 AI를 붙입니다.</p>
+          </div>
+        </article>
+        <article class="card">
+          <div>
+            <h3>보스와 성장</h3>
+            <p>미니보스, 스킬 강화 1단계, 보상 화면, 튜토리얼 개선을 진행합니다.</p>
+          </div>
+        </article>
+        <article class="card">
+          <div>
+            <h3>5직업 완성</h3>
+            <p>기사와 마법사를 추가하고 파티 결속 게이지를 완성합니다.</p>
+          </div>
+        </article>
+        <article class="card">
+          <div>
+            <h3>데모 빌드</h3>
+            <p>3개 스테이지, 보스 2종, 마을 허브, 저장/불러오기, 설정 메뉴를 묶습니다.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>검증 기준</h2>
+      <div class="checklist">
+        <div class="check">키보드만으로 첫 스테이지를 끝까지 플레이할 수 있다.</div>
+        <div class="check">각 직업은 전투 또는 탐험에서 최소 1번 필수적인 순간이 있다.</div>
+        <div class="check">캐릭터 교체 후 조작권이 0.2초 안에 넘어온다.</div>
+        <div class="check">피격 원인과 사망 원인을 화면에서 이해할 수 있다.</div>
+        <div class="check">스테이지 실패 후 10초 안에 재도전할 수 있다.</div>
+        <div class="check">보스전은 한 직업만 반복해도 쉽게 이기지 못한다.</div>
+      </div>
+    </section>
+
+    <footer>
+      <p>권장 엔진: Godot 4. 첫 목표는 3직업 MVP로 핵심 교체 재미를 증명하는 것입니다.</p>
+    </footer>
+  </main>
+</body>
+</html>
