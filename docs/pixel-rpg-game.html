@@ -1014,9 +1014,9 @@
         if (flicker) ctx.globalAlpha = 0.45;
         const actionAsset = assets[roleActionAssetKeys[role().id]];
         if (actionAsset) {
-          drawRoleAction(actionAsset, playerActionForRole(), p.x - 58, p.y - 82, 178, 154, p.facing);
+          drawRoleAction(actionAsset, playerActionForRole(), p.x - 62, p.y - 92, 188, 160, p.facing);
         } else {
-          drawHeroImage(state.selected, p.x - 48, p.y - 74, 156, 146, p.facing);
+          drawHeroImage(state.selected, p.x - 52, p.y - 86, 176, 154, p.facing);
         }
         ctx.globalAlpha = 1;
       }
